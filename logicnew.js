@@ -705,29 +705,64 @@ const itemMeta = {
     folder:     { emoji: "📂", color: "#1a73e8", label: "FOLDER"     }
 };
 
-// Inject course cards into the dashboard grid
-function renderCourseGrid() {
-    const grid = document.getElementById("course-grid");
-    if (!grid) return;
-    grid.innerHTML = "";
+// ── Progress tracking (localStorage) ────────────────────────────────────────
 
-    courses.forEach(course => {
-        const card = document.createElement("div");
-        card.className = "course-card";
-        card.innerHTML = `
-            <div class="course-cover ${course.cover}"></div>
-            <div class="course-info">
-                <h4>${course.title}</h4>
-                <span>${course.semester}</span>
-                <div class="completion-bar-wrap">
-                    <div class="completion-bar" style="width:${course.completion}%"></div>
-                </div>
-                <span class="completion-pct">${course.completion}% complete</span>
+function loadProgress() {
+    try { return JSON.parse(localStorage.getItem('eq_progress') || '{}'); }
+    catch(e) { return {}; }
+}
+function saveProgress(state) {
+    localStorage.setItem('eq_progress', JSON.stringify(state));
+}
+function isItemDone(courseId, itemLabel) {
+    return !!loadProgress()[courseId + '||' + itemLabel];
+}
+function markDone(courseId, itemLabel) {
+    const s = loadProgress();
+    s[courseId + '||' + itemLabel] = true;
+    saveProgress(s);
+}
+function unmarkDone(courseId, itemLabel) {
+    const s = loadProgress();
+    delete s[courseId + '||' + itemLabel];
+    saveProgress(s);
+}
+function calcCompletion(course) {
+    const trackable = course.faculty.flatMap(f => f.items.filter(i => !i.locked));
+    if (!trackable.length) return 0;
+    const done = trackable.filter(i => isItemDone(course.id, i.label)).length;
+    return Math.round((done / trackable.length) * 100);
+}
+
+// ── Inject course cards into the dashboard grid ──────────────────────────────
+function buildCourseCard(course) {
+    const pct = calcCompletion(course);
+    const card = document.createElement("div");
+    card.className = "course-card";
+    card.innerHTML = `
+        <div class="course-cover ${course.cover}"></div>
+        <div class="course-info">
+            <h4>${course.title}</h4>
+            <span class="course-code-tag">${course.code}</span>
+            <span>${course.semester}</span>
+            <div class="completion-bar-wrap">
+                <div class="completion-bar" style="width:${pct}%"></div>
             </div>
-        `;
-        card.addEventListener("click", () => openCourse(course.id));
-        grid.appendChild(card);
+            <span class="completion-pct">${pct}% complete</span>
+        </div>
+    `;
+    card.addEventListener("click", () => openCourse(course.id));
+    return card;
+}
+
+function renderCourseGrid() {
+    ['course-grid', 'course-grid-mycourses'].forEach(id => {
+        const grid = document.getElementById(id);
+        if (!grid) return;
+        grid.innerHTML = "";
+        courses.forEach(course => grid.appendChild(buildCourseCard(course)));
     });
+    renderUpcomingDeadlines();
 }
 
 // Open a course detail page
@@ -751,21 +786,53 @@ function openCourse(courseId) {
             itemsHtml = `<p class="empty-section">No items posted yet.</p>`;
         } else {
             fac.items.forEach(item => {
-                const meta = itemMeta[item.type] || itemMeta.file;
-                const lockHtml  = item.locked ? `<div class="lms-item-lock">🔒 Not available unless you belong to <strong>${fac.name.toUpperCase()}${slotLabel.toUpperCase()}</strong></div>` : "";
-                const dueHtml   = item.due  ? `<div class="lms-item-due">Due Date: ${item.due}</div>` : "";
-                const noteHtml  = item.note ? `<div class="lms-item-note">${item.note}</div>` : "";
-                const doneBtn   = (item.type === "file" && !item.locked) ? `<button class="mark-done-btn">Mark as done</button>` : "";
+                const meta     = itemMeta[item.type] || itemMeta.file;
+                const done     = !item.locked && isItemDone(course.id, item.label);
+                const lockHtml = item.locked
+                    ? `<div class="lms-item-lock">🔒 Not available unless you belong to <strong>${fac.name.toUpperCase()}${slotLabel.toUpperCase()}</strong></div>`
+                    : "";
+                const dueHtml  = item.due  ? `<div class="lms-item-due">📅 Due: ${item.due}</div>` : "";
+                const noteHtml = item.note ? `<div class="lms-item-note">${item.note}</div>` : "";
+
+                // Action button — type-aware
+                let actionBtn = "";
+                if (!item.locked) {
+                    if (done) {
+                        actionBtn = `<button class="mark-done-btn done-btn" disabled>✓ Done</button>`;
+                    } else if (item.type === "assignment" || item.type === "quiz" || item.type === "vpl") {
+                        actionBtn = `<button class="mark-done-btn submit-btn"
+                            data-course="${course.id}" data-label="${item.label.replace(/"/g,'&quot;')}"
+                            data-type="${item.type}"
+                            onclick="openSubmitModal(this)">
+                            ${item.type === 'quiz' ? '📝 Attempt' : '📤 Submit'}
+                        </button>`;
+                    } else if (item.type === "forum") {
+                        actionBtn = `<button class="mark-done-btn forum-btn"
+                            data-course="${course.id}" data-label="${item.label.replace(/"/g,'&quot;')}"
+                            onclick="openForumModal(this)">
+                            💬 Open
+                        </button>`;
+                    } else {
+                        // file / page / folder
+                        actionBtn = `<button class="mark-done-btn"
+                            data-course="${course.id}" data-label="${item.label.replace(/"/g,'&quot;')}"
+                            onclick="quickMarkDone(this)">
+                            Mark as done
+                        </button>`;
+                    }
+                }
 
                 itemsHtml += `
-                    <div class="lms-item-row">
-                        <div class="lms-item-icon" style="background:${meta.color};">${meta.emoji}</div>
+                    <div class="lms-item-row ${done ? 'item-done' : ''}">
+                        <div class="lms-item-icon" style="background:${meta.color}15;border:1.5px solid ${meta.color}30;">
+                            <span style="font-size:18px">${done ? '✅' : meta.emoji}</span>
+                        </div>
                         <div class="lms-item-info">
-                            <span class="lms-item-type">${meta.label}</span>
-                            <span class="lms-item-name ${!item.locked ? 'lms-link' : ''}">${item.label}</span>
+                            <span class="lms-item-type" style="color:${meta.color}">${meta.label}</span>
+                            <span class="lms-item-name ${!item.locked ? 'lms-link' : ''} ${done ? 'item-name-done' : ''}">${item.label}</span>
                             ${dueHtml}${noteHtml}${lockHtml}
                         </div>
-                        ${doneBtn}
+                        ${actionBtn}
                     </div>
                 `;
             });
@@ -790,7 +857,172 @@ function openCourse(courseId) {
     showPage('course-detail');
 }
 
-// Collapse / expand a faculty section
+// ── Quick mark-done (files / pages / folders) ────────────────────────────────
+function quickMarkDone(btn) {
+    const courseId = btn.dataset.course;
+    const label    = btn.dataset.label;
+    markDone(courseId, label);
+    const row = btn.closest('.lms-item-row');
+    row.classList.add('item-done');
+    row.querySelector('.lms-item-name').classList.add('item-name-done');
+    const iconEl = row.querySelector('.lms-item-icon span');
+    if (iconEl) iconEl.textContent = '✅';
+    btn.textContent = '✓ Done';
+    btn.classList.add('done-btn');
+    btn.disabled = true;
+    refreshCompletionUI(courseId);
+}
+
+// ── Submit modal (assignments / quizzes / VPL) ────────────────────────────────
+function openSubmitModal(btn) {
+    const courseId = btn.dataset.course;
+    const label    = btn.dataset.label;
+    const type     = btn.dataset.type;
+    const isQuiz   = type === 'quiz';
+
+    document.getElementById('submit-modal-title').textContent =
+        (isQuiz ? '📝 ' : '📤 ') + label;
+    document.getElementById('submit-modal-subtitle').textContent =
+        isQuiz ? 'Write your answers below and submit when ready.'
+               : 'Paste a link, write notes, or describe your submission.';
+    document.getElementById('submit-modal-textarea').value = '';
+    document.getElementById('submit-modal-textarea').placeholder =
+        isQuiz ? 'Q1: …\nQ2: …' : 'Submission notes or link…';
+
+    const confirmBtn = document.getElementById('submit-modal-confirm');
+    confirmBtn.onclick = function() {
+        markDone(courseId, label);
+        closeSubmitModal();
+        openCourse(courseId);        // re-render the course page to reflect done state
+        refreshCompletionUI(courseId);
+    };
+
+    document.getElementById('submit-modal-overlay').classList.add('active');
+}
+
+function closeSubmitModal() {
+    document.getElementById('submit-modal-overlay').classList.remove('active');
+}
+
+// ── Forum modal ───────────────────────────────────────────────────────────────
+function openForumModal(btn) {
+    const courseId = btn.dataset.course;
+    const label    = btn.dataset.label;
+    const course   = courses.find(c => c.id === courseId);
+
+    document.getElementById('forum-modal-title').textContent = '💬 ' + label;
+    document.getElementById('forum-modal-body').innerHTML =
+        `<div class="forum-post">
+            <div class="forum-post-avatar">👩‍🏫</div>
+            <div class="forum-post-content">
+                <p class="forum-post-author">${course ? course.faculty[0].name : 'Instructor'} <span>· Course Announcements</span></p>
+                <p class="forum-post-text">Welcome to <strong>${course ? course.title : label}</strong>! This forum is for course announcements and updates. Check here regularly for important notices, deadlines, and resources.</p>
+                <p class="forum-post-time">Posted at course start</p>
+            </div>
+        </div>
+        <div class="forum-post">
+            <div class="forum-post-avatar">📌</div>
+            <div class="forum-post-content">
+                <p class="forum-post-author">System <span>· Pinned</span></p>
+                <p class="forum-post-text">All assignment submissions must follow the format specified in the course syllabus. Late submissions will be penalised as per institute policy.</p>
+                <p class="forum-post-time">Pinned notice</p>
+            </div>
+        </div>`;
+
+    // Mark forum as "read/done"
+    markDone(courseId, label);
+    refreshCompletionUI(courseId);
+
+    document.getElementById('forum-modal-overlay').classList.add('active');
+}
+
+function closeForumModal() {
+    document.getElementById('forum-modal-overlay').classList.remove('active');
+}
+
+// ── Refresh completion bar on course cards without full re-render ─────────────
+function refreshCompletionUI(courseId) {
+    const course = courses.find(c => c.id === courseId);
+    if (!course) return;
+    const pct = calcCompletion(course);
+    // Update all matching cards in both grids
+    document.querySelectorAll('.course-card').forEach(card => {
+        const h4 = card.querySelector('h4');
+        if (h4 && h4.textContent === course.title) {
+            const bar = card.querySelector('.completion-bar');
+            const txt = card.querySelector('.completion-pct');
+            if (bar) bar.style.width = pct + '%';
+            if (txt) txt.textContent = pct + '% complete';
+        }
+    });
+    // Also refresh the deadlines widget
+    renderUpcomingDeadlines();
+}
+
+// ── Upcoming deadlines ────────────────────────────────────────────────────────
+function parseItemDate(str) {
+    if (!str) return null;
+    // Handle "DD-MM-YYYY" format
+    const dmyMatch = str.match(/^(\d{1,2})-(\d{1,2})-(\d{4})/);
+    if (dmyMatch) return new Date(+dmyMatch[3], +dmyMatch[2]-1, +dmyMatch[1]);
+    // Handle "D Mon YYYY, H:MM AM/PM" or similar
+    const d = new Date(str);
+    return isNaN(d) ? null : d;
+}
+
+function renderUpcomingDeadlines() {
+    const container = document.getElementById('deadlines-widget');
+    if (!container) return;
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const deadlines = [];
+
+    courses.forEach(course => {
+        course.faculty.forEach(fac => {
+            fac.items.forEach(item => {
+                if (!item.due || item.locked) return;
+                if (isItemDone(course.id, item.label)) return;
+                const d = parseItemDate(item.due);
+                if (!d) return;
+                deadlines.push({ course, item, date: d });
+            });
+        });
+    });
+
+    deadlines.sort((a, b) => a.date - b.date);
+    const upcoming = deadlines.slice(0, 5);
+
+    if (!upcoming.length) {
+        container.innerHTML = '';
+        container.closest('.deadlines-section') && (container.closest('.deadlines-section').style.display = 'none');
+        return;
+    }
+
+    const section = container.closest('.deadlines-section');
+    if (section) section.style.display = '';
+
+    container.innerHTML = upcoming.map(({ course, item, date }) => {
+        const diff  = Math.ceil((date - today) / 86400000);
+        const urgency = diff <= 1 ? 'urgent' : diff <= 3 ? 'soon' : 'normal';
+        const meta  = itemMeta[item.type] || itemMeta.file;
+        const label = diff < 0  ? 'Overdue'
+                    : diff === 0 ? 'Today'
+                    : diff === 1 ? 'Tomorrow'
+                    : `In ${diff} days`;
+        return `
+            <div class="deadline-chip ${urgency}" onclick="openCourse('${course.id}')">
+                <span class="deadline-emoji">${meta.emoji}</span>
+                <div class="deadline-info">
+                    <span class="deadline-label">${item.label}</span>
+                    <span class="deadline-course">${course.code}</span>
+                </div>
+                <span class="deadline-badge ${urgency}">${label}</span>
+            </div>`;
+    }).join('');
+}
+
+// ── Collapse / expand a faculty section ──────────────────────────────────────
 function toggleSection(header) {
     const items  = header.nextElementSibling;
     const toggle = header.querySelector(".faculty-toggle");

@@ -217,6 +217,12 @@
                         </div>
                     </div>
                 </div>
+                <!-- Upcoming deadlines widget -->
+                <div class="deadlines-section" style="display:none;">
+                    <p class="dash-sub dash-sub--courses" style="margin-bottom:12px;">⏰ Upcoming deadlines</p>
+                    <div class="deadlines-list" id="deadlines-widget"></div>
+                </div>
+
                 <p class="dash-sub dash-sub--courses">Your courses</p>
                 <div class="course-grid" id="course-grid"></div>
             </div>
@@ -707,6 +713,32 @@
 
 <!-- Pomodoro toast -->
 <div class="pom-toast" id="pom-toast"></div>
+
+<!-- ══ SUBMISSION MODAL ══════════════════════════════════════════════════════ -->
+<div id="submit-modal-overlay" class="course-modal-overlay" onclick="closeSubmitModal()">
+    <div class="course-modal" onclick="event.stopPropagation()">
+        <button class="course-modal-close" onclick="closeSubmitModal()">✕</button>
+        <h3 id="submit-modal-title" class="course-modal-title"></h3>
+        <p id="submit-modal-subtitle" class="course-modal-sub"></p>
+        <textarea id="submit-modal-textarea" class="course-modal-textarea" rows="6"></textarea>
+        <div class="course-modal-actions">
+            <button class="course-modal-btn primary" id="submit-modal-confirm">Submit ✓</button>
+            <button class="course-modal-btn secondary" onclick="closeSubmitModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ FORUM MODAL ═══════════════════════════════════════════════════════════ -->
+<div id="forum-modal-overlay" class="course-modal-overlay" onclick="closeForumModal()">
+    <div class="course-modal" onclick="event.stopPropagation()">
+        <button class="course-modal-close" onclick="closeForumModal()">✕</button>
+        <h3 id="forum-modal-title" class="course-modal-title"></h3>
+        <div id="forum-modal-body" class="forum-modal-body"></div>
+        <div class="course-modal-actions">
+            <button class="course-modal-btn secondary" onclick="closeForumModal()">Close</button>
+        </div>
+    </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="logicnew.js"></script>
