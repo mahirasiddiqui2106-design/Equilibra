@@ -1454,7 +1454,7 @@ function selectMood(mood) {
 
 let nemoChatReady         = false;
 let nemoChatSessionActive = false;
-let nemoApiKey            = '';
+let nemoApiKey            = localStorage.getItem('nemo_groq_key') || '';
 let nemoChatHistory       = [];   // [{role:'user'|'assistant', content:'...'}]
 
 const NEMO_SYSTEM_PROMPT =
@@ -1560,14 +1560,31 @@ function nemoSetApiKey() {
     var input = document.getElementById('nemo-key-input');
     if (!input || !input.value.trim()) return;
     nemoApiKey = input.value.trim();
+    localStorage.setItem('nemo_groq_key', nemoApiKey);   // persist across sessions
     var history = document.getElementById('nemo-chat-history');
     if (history) history.innerHTML = '';
     nemoChatHistory = [];
     nemoBasicUsed   = [];
     nemoChatAppend('nemo', "Hey \u2014 I\u2019m Nemo. This is a safe, judgement-free space. Tell me what\u2019s on your mind and I\u2019ll be right here with you. \uD83D\uDC3C");
+    nemoShowKeyStatus();
     document.getElementById('nemo-chat-input').disabled = false;
     document.getElementById('nemo-chat-send').disabled  = false;
     document.getElementById('nemo-chat-input').focus();
+}
+
+function nemoForgetApiKey() {
+    nemoApiKey = '';
+    localStorage.removeItem('nemo_groq_key');
+    nemoInitChat();   // re-show the setup card so user can enter a new key
+}
+
+function nemoShowKeyStatus() {
+    var history = document.getElementById('nemo-chat-history');
+    if (!history) return;
+    var bar = document.createElement('div');
+    bar.className = 'nemo-key-status';
+    bar.innerHTML = '🤖 AI mode active &nbsp;·&nbsp; <span class="nemo-change-key-btn" onclick="nemoForgetApiKey()">Change key</span>';
+    history.appendChild(bar);
 }
 
 function nemoSkipApiKey() {
@@ -1634,6 +1651,7 @@ function resetNemoChat() {
     // Show API key setup card (or skip straight in if key already saved)
     if (nemoApiKey) {
         nemoChatAppend('nemo', "Hey \u2014 I\u2019m Nemo. What\u2019s on your mind today? \uD83D\uDC3C");
+        nemoShowKeyStatus();
         document.getElementById('nemo-chat-input').disabled = false;
         document.getElementById('nemo-chat-send').disabled  = false;
     } else {
