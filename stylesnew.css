@@ -47,16 +47,22 @@ body {
     z-index: 1000;
 }
 
-.banner-content {
-    line-height: 60px;
+.banner-track {
+    display: inline-block;
     white-space: nowrap;
-    animation: slide 18s linear infinite;
+    line-height: 60px;
+    animation: bannerScroll linear infinite;
+    /* duration set dynamically by JS based on content width */
 }
 
-@keyframes slide {
-    from { transform: translateX(100%); }
-    to { transform: translateX(-100%); }
+@keyframes bannerScroll {
+    from { transform: translateX(100vw);  }
+    to   { transform: translateX(-100%); }
 }
+
+.banner-quote  { font-size: 13.5px; font-weight: 500; color: #fff; letter-spacing: 0.1px; }
+.banner-author { font-size: 13px; font-style: italic; color: rgba(255,255,255,0.72); margin-left: 4px; }
+.banner-sep    { color: rgba(255,255,255,0.35); margin: 0 32px; font-size: 12px; }
 
 
 

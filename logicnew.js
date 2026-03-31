@@ -2,6 +2,48 @@
 // ORIGINAL CODE — unchanged from logic.js
 // =====================================================
 
+// ── Scrolling quotes banner ──────────────────────────
+const bannerQuotes = [
+    { text: "The secret of getting ahead is getting started.",                                                          author: "Mark Twain"          },
+    { text: "Education is the most powerful weapon which you can use to change the world.",                             author: "Nelson Mandela"      },
+    { text: "It does not matter how slowly you go as long as you do not stop.",                                         author: "Confucius"           },
+    { text: "Believe you can and you're halfway there.",                                                                author: "Theodore Roosevelt"  },
+    { text: "The future belongs to those who believe in the beauty of their dreams.",                                   author: "Eleanor Roosevelt"   },
+    { text: "In the middle of difficulty lies opportunity.",                                                            author: "Albert Einstein"     },
+    { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.",                   author: "Winston Churchill"   },
+    { text: "It always seems impossible until it's done.",                                                              author: "Nelson Mandela"      },
+    { text: "You are never too old to set another goal or to dream a new dream.",                                       author: "C.S. Lewis"          },
+    { text: "Don't watch the clock; do what it does. Keep going.",                                                      author: "Sam Levenson"        },
+    { text: "Spread love everywhere you go. Let no one ever come to you without leaving happier.",                      author: "Mother Teresa"       },
+    { text: "The only way to do great work is to love what you do.",                                                    author: "Steve Jobs"          },
+    { text: "You have brains in your head. You have feet in your shoes. You can steer yourself any direction you choose.", author: "Dr. Seuss"        },
+    { text: "The best time to plant a tree was 20 years ago. The second best time is now.",                             author: "Chinese Proverb"     },
+    { text: "Act as if what you do makes a difference. It does.",                                                       author: "William James"       },
+    { text: "What you get by achieving your goals is not as important as what you become by achieving your goals.",     author: "Zig Ziglar"          },
+    { text: "Try not to become a man of success, but rather try to become a man of value.",                             author: "Albert Einstein"     },
+    { text: "I have not failed. I've just found 10,000 ways that won't work.",                                          author: "Thomas Edison"       },
+];
+
+function initBanner() {
+    const track = document.getElementById('banner-track');
+    if (!track) return;
+
+    track.innerHTML = bannerQuotes.map(q =>
+        `<span class="banner-quote">"${q.text}"</span>`+
+        `<span class="banner-author">— ${q.author}</span>`+
+        `<span class="banner-sep">✦</span>`
+    ).join('');
+
+    // Calculate scroll speed: 90px per second feels natural
+    requestAnimationFrame(() => {
+        const totalPx  = track.scrollWidth + window.innerWidth;
+        const duration = Math.round(totalPx / 90);
+        track.style.animationDuration = duration + 's';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initBanner);
+
 const equilibraFeatures = [
   {
     id: "mirror",
