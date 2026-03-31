@@ -35,6 +35,98 @@
             Get started →
         </button>
     </div>
+
+    <!-- Nemo peek character — peeks in from the right side -->
+    <div class="landing-panda-wrap" id="landing-panda">
+        <div class="panda-speech-bubble">Hi! I'm Nemo 🐼</div>
+        <span class="panda-sparkle ps1">✨</span>
+        <span class="panda-sparkle ps2">✨</span>
+
+        <svg class="landing-panda-svg" viewBox="0 0 260 300" xmlns="http://www.w3.org/2000/svg">
+
+            <!-- ── Body (sits mostly off-screen to the right) ── -->
+            <ellipse cx="148" cy="238" rx="72" ry="66" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="1.5"/>
+
+            <!-- ── Right arm resting (hangs down, goes off-screen right) ── -->
+            <path d="M 190 195 C 202 212, 210 230, 214 248" stroke="#1e1e1e" stroke-width="28" stroke-linecap="round" fill="none"/>
+            <circle cx="215" cy="252" r="18" fill="#1e1e1e"/>
+
+            <!-- ── Left arm WAVING ──────────────────────────────────
+                 Shoulder pivot at SVG (62, 196). Group is translated
+                 to that point; arm elements are drawn around (0,0).
+                 SMIL animateTransform rotates the group around (0,0)
+                 which is the shoulder — arm waves toward the viewer. -->
+            <g transform="translate(62, 196)">
+                <!-- Arm shaft curves upward-left from shoulder -->
+                <path d="M 0 0 C -5 -20, -16 -44, -28 -60"
+                      stroke="#1e1e1e" stroke-width="28" stroke-linecap="round" fill="none"/>
+                <!-- Paw -->
+                <circle cx="-30" cy="-63" r="19" fill="#1e1e1e"/>
+                <!-- Three knuckle bumps -->
+                <circle cx="-42" cy="-76" r="7.5" fill="#2e2e2e"/>
+                <circle cx="-28" cy="-81" r="7.5" fill="#2e2e2e"/>
+                <circle cx="-14" cy="-76" r="7.5" fill="#2e2e2e"/>
+
+                <!-- SMIL wave — arm swings back and forth 4 times, then settles -->
+                <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    values="0; 28; -16; 24; -12; 18; -8; 5; 0"
+                    keyTimes="0; 0.12; 0.25; 0.38; 0.50; 0.62; 0.75; 0.88; 1"
+                    dur="2.4s"
+                    begin="1.6s"
+                    fill="freeze"
+                    additive="sum"
+                    calcMode="linear"
+                />
+            </g>
+
+            <!-- ── Head (drawn on top of arm base) ── -->
+            <circle cx="96" cy="115" r="68" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="1.5"/>
+
+            <!-- ── Ears ── -->
+            <circle cx="36"  cy="58" r="36" fill="#1e1e1e"/>
+            <circle cx="156" cy="58" r="36" fill="#1e1e1e"/>
+            <!-- Inner ears — purple theme accent -->
+            <circle cx="36"  cy="58" r="20" fill="#6a5cff"/>
+            <circle cx="156" cy="58" r="20" fill="#6a5cff"/>
+
+            <!-- ── Eye patches ── -->
+            <ellipse cx="72"  cy="112" rx="27" ry="24" fill="#1e1e1e" transform="rotate(-12, 72, 112)"/>
+            <ellipse cx="120" cy="112" rx="27" ry="24" fill="#1e1e1e" transform="rotate(12, 120, 112)"/>
+
+            <!-- ── Eyes ── -->
+            <circle cx="72"  cy="112" r="14.5" fill="white"/>
+            <circle cx="120" cy="112" r="14.5" fill="white"/>
+
+            <!-- ── Pupils — shifted slightly left (glancing toward visitor) ── -->
+            <circle cx="70"  cy="114" r="8.5" fill="#1a0a3e"/>
+            <circle cx="118" cy="114" r="8.5" fill="#1a0a3e"/>
+
+            <!-- ── Eye shine ── -->
+            <circle cx="73"  cy="109" r="3.8" fill="white"/>
+            <circle cx="121" cy="109" r="3.8" fill="white"/>
+
+            <!-- ── Nose ── -->
+            <ellipse cx="96" cy="136" rx="11" ry="7.5" fill="#1e1e1e"/>
+
+            <!-- ── Mouth — big happy smile ── -->
+            <path d="M 78 148 Q 96 170 114 148"
+                  stroke="#555" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+            <!-- ── Cheek blush — purple-tinted to match theme ── -->
+            <ellipse cx="46"  cy="132" rx="18" ry="12" fill="rgba(106,92,255,0.14)"/>
+            <ellipse cx="146" cy="132" rx="18" ry="12" fill="rgba(106,92,255,0.14)"/>
+
+            <!-- ── Tiny cyan scarf at neck — theme accent ── -->
+            <ellipse cx="108" cy="182" rx="44" ry="11" fill="#3ccfcf" opacity="0.88"/>
+            <ellipse cx="108" cy="175" rx="14"  ry="10" fill="#2ab8b8"/>
+            <!-- Scarf knot detail -->
+            <ellipse cx="103" cy="174" rx="7" ry="6" fill="#1e9e9e"/>
+            <ellipse cx="114" cy="175" rx="6" ry="5" fill="#1e9e9e"/>
+
+        </svg>
+    </div>
 </section>
 
 
