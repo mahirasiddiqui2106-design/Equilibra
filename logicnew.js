@@ -52,6 +52,7 @@ function showPage(pageId) {
     if (pageId === "dashboard") {
         renderEquilibraCards();
         renderCourseGrid();
+        updateDashGreeting();
     }
 
     if (pageId === "pomodoro") {
@@ -78,7 +79,24 @@ function showPage(pageId) {
 
 
 function loginUser() {
-    showPage('welcome');
+    showPage('dashboard');
+}
+
+function updateDashGreeting() {
+    const now = new Date();
+    const hour = now.getHours();
+    let timeLabel = 'Good morning';
+    if (hour >= 12 && hour < 17) timeLabel = 'Good afternoon';
+    else if (hour >= 17) timeLabel = 'Good evening';
+
+    const timeEl = document.getElementById('dash-time-label');
+    const dateEl = document.getElementById('dash-date-label');
+    if (timeEl) timeEl.textContent = timeLabel;
+    if (dateEl) {
+        dateEl.textContent = now.toLocaleDateString('en-US', {
+            weekday: 'long', month: 'long', day: 'numeric'
+        });
+    }
 }
 
 

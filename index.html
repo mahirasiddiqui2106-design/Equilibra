@@ -16,10 +16,23 @@
 
 
 <section id="landing" class="page active">
+    <div class="landing-orb orb-1"></div>
+    <div class="landing-orb orb-2"></div>
+    <div class="landing-orb orb-3"></div>
     <div class="landing-content">
-        <h1 class="logo">EQUILIBRA</h1>
-        <button class="primary-btn" onclick="showPage('login')">
-            Login / Sign Up
+        <div class="landing-logo-wrap">
+            <h1 class="logo">EQUILIBRA</h1>
+            <p class="logo-tagline">Balance your mind. Master your studies.</p>
+        </div>
+        <p class="landing-desc">A calm space where your academic journey meets your mental wellness — designed to keep you steady, not overwhelmed.</p>
+        <div class="landing-pills">
+            <span class="landing-pill">🌱 Burnout Check</span>
+            <span class="landing-pill">🐼 Mood Buddy</span>
+            <span class="landing-pill">⏱️ Focus Timer</span>
+            <span class="landing-pill">🧱 Unload Wall</span>
+        </div>
+        <button class="primary-btn landing-btn" onclick="showPage('login')">
+            Get started →
         </button>
     </div>
 </section>
@@ -78,8 +91,41 @@
 
             <!-- DASHBOARD VIEW -->
             <div id="dashboard-view">
-                <h2 class="dash-heading">Welcome back 👋</h2>
-                <p class="dash-sub">Course overview</p>
+                <div class="dash-greeting-card">
+                    <div class="dash-greeting-left">
+                        <p class="dash-greeting-time" id="dash-time-label">Good morning</p>
+                        <h2 class="dash-greeting-name">Welcome back 👋</h2>
+                        <p class="dash-greeting-date" id="dash-date-label"></p>
+                    </div>
+                    <div class="dash-greeting-quote">
+                        <span class="dash-quote-icon">✨</span>
+                        <span class="dash-quote-text">You don't have to do everything today.</span>
+                    </div>
+                </div>
+                <div class="dash-stats-row">
+                    <div class="dash-stat-chip">
+                        <span class="dash-stat-icon">📚</span>
+                        <div class="dash-stat-info">
+                            <span class="dash-stat-val" id="dash-stat-courses">13</span>
+                            <span class="dash-stat-lbl">Courses enrolled</span>
+                        </div>
+                    </div>
+                    <div class="dash-stat-chip">
+                        <span class="dash-stat-icon">📋</span>
+                        <div class="dash-stat-info">
+                            <span class="dash-stat-val">Active</span>
+                            <span class="dash-stat-lbl">Fall Semester 2025–26</span>
+                        </div>
+                    </div>
+                    <div class="dash-stat-chip dash-stat-chip--accent" onclick="showPage('pomodoro')" style="cursor:pointer;">
+                        <span class="dash-stat-icon">🍅</span>
+                        <div class="dash-stat-info">
+                            <span class="dash-stat-val">Focus</span>
+                            <span class="dash-stat-lbl">Start a Pomodoro</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="dash-sub dash-sub--courses">Your courses</p>
                 <div class="course-grid" id="course-grid"></div>
             </div>
 
