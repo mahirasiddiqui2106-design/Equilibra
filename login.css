@@ -1,0 +1,110 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    background: linear-gradient(135deg, #6a5cff, #3ccfcf);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2e2e2e;
+}
+
+/* PAGE */
+.auth-page {
+    text-align: center;
+    color: white;
+}
+
+/* BRAND */
+.auth-logo {
+    font-family: 'Poppins', sans-serif;
+    font-size: 64px;
+    letter-spacing: 6px;
+    margin-bottom: 6px;
+}
+
+.auth-tagline {
+    font-style: italic;
+    opacity: 0.9;
+    margin-bottom: 40px;
+}
+
+/* CARD */
+.auth-card {
+    background: white;
+    width: 420px;
+    padding: 42px 36px;
+    border-radius: 26px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    text-align: center;
+}
+
+/* TEXT */
+.auth-card h2 {
+    margin-bottom: 6px;
+}
+
+.auth-sub {
+    color: #666;
+    margin-bottom: 26px;
+}
+
+/* INPUTS */
+.auth-card input {
+    width: 100%;
+    padding: 16px;
+    margin-bottom: 18px;
+    border-radius: 14px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+}
+
+/* BUTTONS */
+.primary-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 30px;
+    border: none;
+    background: linear-gradient(135deg,#6a5cff,#7b8cff);
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    margin-bottom: 18px;
+}
+
+.secondary-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 30px;
+    border: 1px solid #6a5cff;
+    background: none;
+    color: #6a5cff;
+    cursor: pointer;
+}
+
+/* LINKS */
+.auth-links {
+    font-size: 14px;
+    margin-bottom: 22px;
+}
+
+.auth-links a {
+    color: #6a5cff;
+    text-decoration: none;
+}
+
+.auth-links span {
+    margin: 0 8px;
+    color: #aaa;
+}
+
+/* DIVIDER */
+.divider {
+    margin: 20px 0;
+    font-size: 13px;
+    color: #aaa;
+}

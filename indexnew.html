@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Equilibra</title>
+    <link rel="stylesheet" href="stylesnew.css">
+</head>
+<body>
+
+
+<div class="floating-banner">
+    <div class="banner-content">
+        Thought of the Day: You don't have to do everything today.
+    </div>
+</div>
+
+
+<section id="landing" class="page active">
+    <div class="landing-content">
+        <h1 class="logo">EQUILIBRA</h1>
+        <button class="primary-btn" onclick="showPage('login')">
+            Login / Sign Up
+        </button>
+    </div>
+</section>
+
+
+<section id="login" class="page">
+    <div class="login-card">
+        <h2>Login or create an account</h2>
+        <p class="login-sub">Enter Equilibra at your own pace.</p>
+
+        <input type="email" placeholder="Email">
+        <input type="password" placeholder="Password">
+
+        <button class="primary-btn" onclick="loginUser()">Continue</button>
+
+        <div class="login-links">
+            <span class="text-link">Forgot password?</span>
+            <span class="text-link" onclick="showOTP()">Login with OTP</span>
+        </div>
+
+        <div id="otp-box">
+            <input type="text" id="otp-input" placeholder="Enter OTP">
+            <button class="primary-btn" onclick="verifyOTP()">Verify OTP</button>
+        </div>
+
+        <button class="secondary-btn" onclick="showPage('landing')">
+            Back
+        </button>
+    </div>
+</section>
+
+
+<section id="welcome" class="page">
+    <div class="welcome-container">
+        <h1 id="welcome-title"></h1>
+        <button class="primary-btn" onclick="showPage('dashboard')">
+            Enter your space
+        </button>
+    </div>
+</section>
+
+
+<section id="dashboard" class="page dashboard-page">
+
+    <header class="dashboard-top">
+        <nav class="lms-nav">
+            <span class="lms-item active" id="nav-dashboard" onclick="switchTab('dashboard-view')">Dashboard</span>
+            <span class="lms-item" id="nav-mycourses" onclick="switchTab('mycourses-view')">My Courses</span>
+            <span class="lms-item" id="nav-calendar" onclick="switchTab('calendar-view')">Calendar</span>
+        </nav>
+    </header>
+
+    <div class="dashboard-body">
+
+        <main class="courses-area">
+
+            <!-- DASHBOARD VIEW -->
+            <div id="dashboard-view">
+                <h2 class="dash-heading">Welcome back 👋</h2>
+                <p class="dash-sub">Course overview</p>
+                <div class="course-grid" id="course-grid"></div>
+            </div>
+
+            <!-- MY COURSES VIEW -->
+            <div id="mycourses-view" style="display:none;">
+                <h2 class="dash-heading">My Courses</h2>
+                <p class="dash-sub">All your enrolled courses</p>
+                <div class="course-grid" id="course-grid-mycourses"></div>
+            </div>
+
+            <!-- CALENDAR VIEW -->
+            <div id="calendar-view" style="display:none;">
+                <div class="calendar-header-row">
+                    <h2 class="dash-heading" style="margin:0;">Calendar</h2>
+                    <button class="new-event-btn">New event</button>
+                </div>
+                <div class="calendar-controls">
+                    <span class="cal-nav-btn" onclick="changeMonth(-1)">◀ <span id="prev-month-label"></span></span>
+                    <h3 id="cal-month-title" class="cal-month-title"></h3>
+                    <span class="cal-nav-btn" onclick="changeMonth(1)"><span id="next-month-label"></span> ▶</span>
+                </div>
+                <div class="calendar-grid">
+                    <div class="cal-day-header">Mon</div>
+                    <div class="cal-day-header">Tue</div>
+                    <div class="cal-day-header">Wed</div>
+                    <div class="cal-day-header">Thu</div>
+                    <div class="cal-day-header">Fri</div>
+                    <div class="cal-day-header">Sat</div>
+                    <div class="cal-day-header">Sun</div>
+                    <div id="cal-days"></div>
+                </div>
+                <div class="cal-footer">
+                    <span class="cal-footer-link">Full calendar</span>
+                    <span style="color:#999"> • </span>
+                    <span class="cal-footer-link">Import or export calendars</span>
+                </div>
+            </div>
+
+        </main>
+
+        <aside class="equilibra-panel">
+            <h3>Equilibra</h3>
+            <div class="equilibra-cards" id="equilibra-cards-dash"></div>
+        </aside>
+
+    </div>
+</section>
+
+
+<!-- NEW: Course detail page — appears when a course card is clicked -->
+<section id="course-detail" class="page dashboard-page">
+
+    <header class="dashboard-top">
+        <nav class="lms-nav">
+            <span class="lms-item" onclick="showPage('dashboard')" style="cursor:pointer;">Dashboard</span>
+            <span class="lms-item active" id="detail-nav-title">Course</span>
+        </nav>
+    </header>
+
+    <div class="dashboard-body">
+
+        <main class="courses-area">
+            <button class="back-btn" onclick="showPage('dashboard')">← Back to Dashboard</button>
+
+            <div id="detail-cover" class="detail-cover-banner"></div>
+
+            <div class="detail-title-row">
+                <div>
+                    <h2 id="detail-title"></h2>
+                    <span id="detail-semester" class="detail-sem-tag"></span>
+                </div>
+                <div class="detail-tabs">
+                    <span class="dtab active">Course</span>
+                    <span class="dtab">Participants</span>
+                    <span class="dtab">Grades</span>
+                    <span class="dtab">Competencies</span>
+                </div>
+            </div>
+
+            <div id="faculty-sections" class="faculty-sections"></div>
+        </main>
+
+        <aside class="equilibra-panel">
+            <h3>Equilibra</h3>
+            <!-- Equilibra cards rendered here by JS when detail page opens -->
+            <div class="equilibra-cards" id="detail-equilibra-cards"></div>
+        </aside>
+
+    </div>
+</section>
+
+
+<!-- ══ NEMO MOOD BUDDY PANEL ════════════════════════════════════════════════ -->
+<div id="nemo-modal-overlay" class="nemo-modal-overlay" onclick="closeNemoOutside(event)">
+<div id="nemo-panel" class="nemo-panel">
+
+  <div class="nemo-panel-header">
+    <button class="nemo-panel-close" onclick="closeNemo()">✕</button>
+
+    <div class="nemo-panda-wrap">
+      <div class="nemo-panda" id="nemo-panda">
+        <div class="panda-ear left"></div>
+        <div class="panda-ear right"></div>
+        <div class="panda-head">
+          <div class="panda-eye-patch left"></div>
+          <div class="panda-eye-patch right"></div>
+          <div class="panda-eye left"></div>
+          <div class="panda-eye right"></div>
+          <div class="panda-nose"></div>
+          <div class="panda-mouth"></div>
+          <div class="panda-cheek left"></div>
+          <div class="panda-cheek right"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="nemo-greeting" id="nemo-greeting">Hi there 🐼</p>
+  </div>
+
+  <div class="nemo-panel-body">
+
+    <div id="nemo-mood-screen" class="nemo-screen">
+      <p class="nemo-screen-label">How are you feeling right now?</p>
+      <div class="nemo-mood-faces">
+        <button class="nemo-mood-btn" data-mood="great"      onclick="selectMood('great')">      <span>✨</span><small>Great</small>    </button>
+        <button class="nemo-mood-btn" data-mood="okay"       onclick="selectMood('okay')">       <span>😊</span><small>Good</small>     </button>
+        <button class="nemo-mood-btn" data-mood="meh"        onclick="selectMood('meh')">        <span>😐</span><small>Meh</small>      </button>
+        <button class="nemo-mood-btn" data-mood="tired"      onclick="selectMood('tired')">      <span>😔</span><small>Tired</small>    </button>
+        <button class="nemo-mood-btn" data-mood="struggling" onclick="selectMood('struggling')"> <span>🌧</span><small>Hard day</small> </button>
+      </div>
+      <div class="nemo-mood-response" id="nemo-mood-response" style="display:none;">
+        <p id="nemo-mood-text"></p>
+      </div>
+    </div>
+
+    <div id="nemo-talk-screen" class="nemo-screen nemo-chat-screen" style="display:none;">
+      <div class="nemo-chat-history" id="nemo-chat-history"></div>
+      <div class="nemo-chat-bar">
+        <textarea id="nemo-chat-input" class="nemo-chat-textarea"
+                  placeholder="Talk to me…" rows="1"></textarea>
+        <button class="nemo-chat-send-btn" id="nemo-chat-send" onclick="nemoChatSend()">↑</button>
+      </div>
+    </div>
+
+    <div id="nemo-breathe-screen" class="nemo-screen" style="display:none;">
+      <p class="nemo-screen-label">Follow Nemo's breathing</p>
+      <div class="breathe-phase-label" id="breathe-phase">Ready?</div>
+      <div class="breathe-count" id="breathe-count"></div>
+      <div class="breathe-controls">
+        <button class="breathe-start-btn" id="breathe-start-btn" onclick="startBreathing()">▶ Start</button>
+        <button class="breathe-stop-btn"  id="breathe-stop-btn"  onclick="stopBreathing()" style="display:none;">■ Stop</button>
+      </div>
+      <p class="breathe-note">4 in · 2 hold · 6 out · 3 rounds</p>
+    </div>
+
+  </div>
+
+  <div class="nemo-tabs">
+    <button class="nemo-tab active" id="ntab-mood"    onclick="switchNemoScreen('mood')">    🐾 Mood    </button>
+    <button class="nemo-tab"        id="ntab-talk"    onclick="switchNemoScreen('talk')">    💬 Talk    </button>
+    <button class="nemo-tab"        id="ntab-breathe" onclick="switchNemoScreen('breathe')"> 🌬 Breathe </button>
+  </div>
+
+</div>
+</div><!-- /nemo-modal-overlay -->
+
+<!-- Nemo nudge bubble -->
+<div id="nemo-nudge" class="nemo-nudge" style="display:none;">
+  <span class="nudge-avatar">🐼</span>
+  <div class="nudge-content">
+    <p id="nudge-text"></p>
+    <button class="nudge-dismiss" onclick="dismissNudge()">Dismiss</button>
+  </div>
+</div>
+
+<!-- Nemo celebration toast -->
+<div id="nemo-toast" class="nemo-toast" style="display:none;">
+  <span class="toast-avatar">🐼</span>
+  <span id="nemo-toast-msg"></span>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     STUDENT MIRROR — full-screen page
+     ══════════════════════════════════════════════════════════ -->
+<section id="mirror" class="page mirror-page">
+
+  <div class="feature-page-header">
+    <button class="feature-page-back" onclick="closeMirrorModal()">← Back</button>
+    <span class="feature-page-title">🌱 Student Mirror</span>
+    <span></span>
+  </div>
+
+  <div class="mirror-page-body">
+    <div class="mirror-modal">
+
+      <div class="mirror-header">
+        <div class="mirror-header-icon">🌱</div>
+        <h2 class="mirror-title">Student Mirror</h2>
+        <p class="mirror-subtitle">A quiet check-in, just for you. No right answers here.</p>
+      </div>
+
+      <div id="mirror-form" class="mirror-form">
+        <div id="mirror-questions-container"></div>
+        <button class="mirror-submit-btn" onclick="calculateBurnout()">
+          See my reflection →
+        </button>
+      </div>
+
+      <div id="mirror-results" class="mirror-results" style="display:none;">
+
+        <div class="burnout-score-section">
+          <p class="burnout-intro">Here's a gentle read of how you're doing right now:</p>
+          <div class="burnout-score-display">
+            <div class="burnout-ring-wrap">
+              <svg class="burnout-ring-svg" viewBox="0 0 120 120">
+                <circle class="ring-bg"   cx="60" cy="60" r="50"/>
+                <circle class="ring-fill" id="ring-fill-circle" cx="60" cy="60" r="50"
+                        stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
+              </svg>
+              <div class="burnout-num-inside">
+                <span id="burnout-score-num">0</span>
+                <span class="burnout-score-denom">/100</span>
+              </div>
+            </div>
+            <div class="burnout-level-text">
+              <div id="burnout-level-badge" class="burnout-level-badge"></div>
+              <p id="burnout-message" class="burnout-message"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="burnout-radar-section">
+          <p class="radar-heading">Your burnout profile</p>
+          <div class="radar-wrap">
+            <canvas id="burnout-radar-chart" width="300" height="300"></canvas>
+          </div>
+          <div class="radar-legend">
+            <span class="legend-dot" style="background:#6a5cff"></span>
+            <span class="legend-text">Your scores across 5 dimensions</span>
+          </div>
+        </div>
+
+        <div id="burnout-dimensions" class="burnout-dimensions"></div>
+
+        <div class="mirror-retake-row">
+          <button class="mirror-retake-btn" onclick="retakeMirror()">↺ Take again</button>
+          <button class="mirror-close-btn"  onclick="closeMirrorModal()">← Back to Dashboard</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     UNLOAD WALL — full-screen page
+     ══════════════════════════════════════════════════════════ -->
+<section id="unload" class="page unload-page">
+
+  <div class="feature-page-header unload-page-header">
+    <button class="feature-page-back unload-back-btn" onclick="closeUnloadWall()">← Back</button>
+    <span class="feature-page-title" style="color:#e2e0ff;">🧱 Unload Wall</span>
+    <span></span>
+  </div>
+
+  <div class="unload-page-body">
+    <div id="unload-modal" class="unload-fullscreen-inner">
+
+      <div class="unload-sub-row">
+        <p class="unload-sub">Let it out. Then let it go.</p>
+        <div class="unload-mode-switcher">
+          <button class="unload-mode-btn active" data-mode="draw" onclick="switchUnloadMode('draw')">🎨 Draw</button>
+          <button class="unload-mode-btn"        data-mode="type" onclick="switchUnloadMode('type')">✍️ Type</button>
+        </div>
+      </div>
+
+      <div id="unload-draw-screen" class="unload-screen unload-draw-fullscreen">
+        <div class="unload-canvas-wrap" id="unload-canvas-wrap">
+          <canvas id="unload-canvas"></canvas>
+        </div>
+        <div class="unload-draw-tools">
+          <div class="unload-colors" id="unload-colors">
+            <button class="unload-color-swatch active" data-color="#1a1a2e" style="background:#1a1a2e;" title="Ink"></button>
+            <button class="unload-color-swatch"        data-color="#e63946" style="background:#e63946;" title="Red"></button>
+            <button class="unload-color-swatch"        data-color="#f4845f" style="background:#f4845f;" title="Orange"></button>
+            <button class="unload-color-swatch"        data-color="#f9c74f" style="background:#f9c74f;" title="Yellow"></button>
+            <button class="unload-color-swatch"        data-color="#4cc9f0" style="background:#4cc9f0;" title="Blue"></button>
+            <button class="unload-color-swatch"        data-color="#b5179e" style="background:#b5179e;" title="Purple"></button>
+            <button class="unload-color-swatch"        data-color="#ffffff" style="background:#ffffff;border-color:#555;" title="White"></button>
+          </div>
+          <div class="unload-sizes">
+            <button class="unload-size-btn active" data-size="4">S</button>
+            <button class="unload-size-btn"        data-size="11">M</button>
+            <button class="unload-size-btn"        data-size="22">L</button>
+          </div>
+          <button class="unload-tool-btn" id="unload-eraser-btn" onclick="toggleUnloadEraser()">⬜ Eraser</button>
+          <button class="unload-tool-btn" onclick="clearUnloadCanvas()">🗑 Clear</button>
+        </div>
+      </div>
+
+      <div id="unload-type-screen" class="unload-screen unload-type-fullscreen" style="display:none;">
+        <textarea id="unload-textarea" class="unload-textarea"
+                  placeholder="Don't filter it. Don't fix it. Just pour it all out here — worries, anger, noise, whatever is taking up space…"></textarea>
+      </div>
+
+      <div class="unload-release-section">
+        <p class="unload-release-hint" id="unload-release-hint">Ready to let go?</p>
+        <div class="unload-release-btns">
+          <button class="unload-tear-btn" id="unload-tear-btn" onclick="unloadTear()">✂️ Tear</button>
+          <button class="unload-burn-btn" id="unload-burn-btn" onclick="unloadBurn()" style="display:none;">🔥 Burn it</button>
+        </div>
+      </div>
+
+      <div class="unload-gone-popup" id="unload-gone-popup" style="display:none;">
+        <div class="unload-gone-inner">
+          <div class="unload-gone-emoji">🌿</div>
+          <p class="unload-gone-text">Gone. You're lighter now.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     POMODORO PAGE
+     ══════════════════════════════════════════════════════════ -->
+<section id="pomodoro" class="page">
+
+  <div class="pom-header">
+    <button class="pom-back" onclick="leavePomodoroPage()">← Back</button>
+    <span class="pom-title">🍅 Pomodoro Timer</span>
+    <span></span>
+  </div>
+
+  <!-- 3-column layout: [sound+customize] [clock] [stats+tasks] -->
+  <div class="pom-body">
+
+    <!-- ── Col 1: Sound + Customize intervals ── -->
+    <div class="pom-col pom-col-left">
+
+      <div class="pom-panel-card">
+        <div class="pom-panel-label">🔊 Ambient Sound</div>
+        <div class="pom-sound-options">
+          <button class="pom-sound-btn active" data-sound="silent">🔇 Silent</button>
+          <button class="pom-sound-btn" data-sound="white">〰 White</button>
+          <button class="pom-sound-btn" data-sound="brown">🌊 Brown</button>
+          <button class="pom-sound-btn" data-sound="rain">🌧 Rain</button>
+        </div>
+        <div class="pom-vol-row">
+          <span class="pom-vol-label">Vol</span>
+          <input type="range" id="pom-volume" min="0" max="100" value="40"/>
+          <span id="pom-vol-val">40%</span>
+        </div>
+      </div>
+
+      <div class="pom-panel-card pom-customize-card">
+        <div class="pom-panel-label">⚙ Customize Intervals</div>
+        <div class="pom-stepper-grid">
+
+          <div class="pom-stepper-row">
+            <span class="pom-stepper-label">🍅 Focus</span>
+            <div class="pom-stepper">
+              <button class="pom-step-btn" data-target="pom-set-work" data-delta="-1">−</button>
+              <input type="number" id="pom-set-work" value="25" min="1" max="120"/>
+              <span class="pom-step-unit">min</span>
+              <button class="pom-step-btn" data-target="pom-set-work" data-delta="1">+</button>
+            </div>
+          </div>
+
+          <div class="pom-stepper-row">
+            <span class="pom-stepper-label">☕ Short Break</span>
+            <div class="pom-stepper">
+              <button class="pom-step-btn" data-target="pom-set-short" data-delta="-1">−</button>
+              <input type="number" id="pom-set-short" value="5" min="1" max="60"/>
+              <span class="pom-step-unit">min</span>
+              <button class="pom-step-btn" data-target="pom-set-short" data-delta="1">+</button>
+            </div>
+          </div>
+
+          <div class="pom-stepper-row">
+            <span class="pom-stepper-label">🌙 Long Break</span>
+            <div class="pom-stepper">
+              <button class="pom-step-btn" data-target="pom-set-long" data-delta="-1">−</button>
+              <input type="number" id="pom-set-long" value="15" min="1" max="120"/>
+              <span class="pom-step-unit">min</span>
+              <button class="pom-step-btn" data-target="pom-set-long" data-delta="1">+</button>
+            </div>
+          </div>
+
+          <div class="pom-stepper-row">
+            <span class="pom-stepper-label">🔁 Sessions→Long</span>
+            <div class="pom-stepper">
+              <button class="pom-step-btn" data-target="pom-set-cycle" data-delta="-1">−</button>
+              <input type="number" id="pom-set-cycle" value="4" min="1" max="10"/>
+              <span class="pom-step-unit">×</span>
+              <button class="pom-step-btn" data-target="pom-set-cycle" data-delta="1">+</button>
+            </div>
+          </div>
+
+        </div>
+        <div class="pom-settings-footer">
+          <div class="pom-field" style="flex:1">
+            <label>Auto-start</label>
+            <select id="pom-set-auto">
+              <option value="off">Off</option>
+              <option value="on">On</option>
+            </select>
+          </div>
+          <button class="pom-apply-btn" id="pom-apply">Apply ✓</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Col 2 (center): Mode tabs + Canvas clock + Controls ── -->
+    <div class="pom-col pom-col-center">
+
+      <div class="pom-tabs">
+        <button class="pom-tab active" data-mode="work">Focus</button>
+        <button class="pom-tab" data-mode="short">Short Break</button>
+        <button class="pom-tab" data-mode="long">Long Break</button>
+      </div>
+
+      <div class="pom-canvas-wrap" id="pom-canvas-wrap">
+        <canvas id="pomCanvas" width="280" height="280"></canvas>
+      </div>
+
+      <div class="pom-controls">
+        <button class="pom-btn-icon" id="pom-skip"  title="Skip">⏭</button>
+        <button class="pom-btn-main" id="pom-start" title="Start / Pause">▶</button>
+        <button class="pom-btn-icon" id="pom-reset" title="Reset">↺</button>
+      </div>
+
+    </div>
+
+    <!-- ── Col 3: Stats + Tasks ── -->
+    <div class="pom-col pom-col-right">
+
+      <div class="pom-stats">
+        <div class="pom-stat">
+          <div class="pom-stat-val" id="pom-count">0</div>
+          <div class="pom-stat-lbl">Pomodoros</div>
+        </div>
+        <div class="pom-stat">
+          <div class="pom-stat-val" id="pom-focus">0m</div>
+          <div class="pom-stat-lbl">Focus Time</div>
+        </div>
+        <div class="pom-stat">
+          <div class="pom-stat-val" id="pom-done">0</div>
+          <div class="pom-stat-lbl">Done</div>
+        </div>
+      </div>
+
+      <div class="pom-panel-card pom-tasks-card">
+        <div class="pom-panel-label">📋 Tasks</div>
+        <div class="pom-task-input-wrap">
+          <input class="pom-task-input" id="pom-task-input" type="text" placeholder="Add a task…" maxlength="80"/>
+          <button class="pom-task-add" id="pom-task-add">+</button>
+        </div>
+        <ul class="pom-task-list" id="pom-task-list"></ul>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- Pomodoro toast -->
+<div class="pom-toast" id="pom-toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="logicnew.js"></script>
+
+<script>
+// ════════════════════════════════════════════════════════════════════
+//  EQUILIBRA — POMODORO TIMER (Canvas + Web Audio API)
+// ════════════════════════════════════════════════════════════════════
+
+let pomCanvas, pomCtx;
+const POM_SIZE = 280, POM_CX = 140, POM_CY = 140, POM_R = 112, POM_TW = 13;
+
+const POM_MODES = {
+  work:  { label: 'Focus',       color: '#6a5cff', glow: 'rgba(106,92,255,0.55)'  },
+  short: { label: 'Short Break', color: '#3ccfcf', glow: 'rgba(60,207,207,0.55)'  },
+  long:  { label: 'Long Break',  color: '#7b8cff', glow: 'rgba(123,140,255,0.55)' },
+};
+
+let pomCfg      = { work: 25, short: 5, long: 15, cycle: 4, autoStart: false };
+let pomMode     = 'work';
+let pomTotal    = pomCfg.work * 60;
+let pomRemaining= pomTotal;
+let pomRunning  = false;
+let pomRafId    = null, pomLastTS = null, pomAccMs = 0;
+let pomCount    = 0, pomFocusMin = 0, pomSessions = 0;
+let pomReady    = false;
+let pomAudioCtx = null, pomSoundSrc = null, pomSoundGain = null;
+let pomVolume   = 0.4;
+
+// ── Canvas draw (core canvas + drawing in JS concept) ──────────────
+function pomDraw() {
+  if (!pomCtx) return;
+  pomCtx.clearRect(0, 0, POM_SIZE, POM_SIZE);
+  const mode = POM_MODES[pomMode];
+  const progress = pomRemaining / pomTotal;
+  const startA = -Math.PI / 2;
+
+  // 1. 60 tick marks around the ring
+  for (let i = 0; i < 60; i++) {
+    const a = (i / 60) * 2 * Math.PI - Math.PI / 2;
+    const major = i % 5 === 0;
+    pomCtx.beginPath();
+    pomCtx.moveTo(POM_CX + (POM_R + (major ? 13 : 10)) * Math.cos(a), POM_CY + (POM_R + (major ? 13 : 10)) * Math.sin(a));
+    pomCtx.lineTo(POM_CX + (POM_R + (major ? 5  : 7))  * Math.cos(a), POM_CY + (POM_R + (major ? 5  : 7))  * Math.sin(a));
+    pomCtx.strokeStyle = major ? '#c8c4ff' : '#e2e0ff';
+    pomCtx.lineWidth = major ? 2 : 1;
+    pomCtx.stroke();
+  }
+
+  // 2. Background track ring
+  pomCtx.beginPath();
+  pomCtx.arc(POM_CX, POM_CY, POM_R, 0, 2 * Math.PI);
+  pomCtx.strokeStyle = '#e8e6ff'; pomCtx.lineWidth = POM_TW; pomCtx.stroke();
+
+  // 3. Glowing progress arc
+  if (progress > 0) {
+    pomCtx.save();
+    pomCtx.shadowColor = mode.glow; pomCtx.shadowBlur = 18;
+    pomCtx.beginPath();
+    pomCtx.arc(POM_CX, POM_CY, POM_R, startA, startA + 2 * Math.PI * progress);
+    pomCtx.strokeStyle = mode.color; pomCtx.lineWidth = POM_TW; pomCtx.lineCap = 'round'; pomCtx.stroke();
+    pomCtx.restore();
+  }
+
+  // 4. Inner white fill
+  pomCtx.beginPath();
+  pomCtx.arc(POM_CX, POM_CY, POM_R - POM_TW / 2 - 5, 0, 2 * Math.PI);
+  pomCtx.fillStyle = '#ffffff'; pomCtx.fill();
+
+  // 5. Mode label text
+  pomCtx.fillStyle = mode.color; pomCtx.font = '600 12px Poppins,sans-serif';
+  pomCtx.textAlign = 'center'; pomCtx.textBaseline = 'middle';
+  pomCtx.fillText(mode.label.toUpperCase(), POM_CX, POM_CY - 36);
+
+  // 6. Countdown digits
+  pomCtx.fillStyle = '#1a1a2e'; pomCtx.font = 'bold 50px "Space Mono",Courier,monospace';
+  pomCtx.textAlign = 'center'; pomCtx.textBaseline = 'middle';
+  pomCtx.fillText(pomFmt(pomRemaining), POM_CX, POM_CY + 4);
+
+  // 7. Hint text
+  pomCtx.fillStyle = '#9ca3af'; pomCtx.font = '400 10px Poppins,sans-serif';
+  pomCtx.fillText(pomRunning ? 'click to pause' : (pomRemaining < pomTotal ? 'paused' : 'click to start'), POM_CX, POM_CY + 40);
+
+  // 8. Session dots
+  const dots = pomCfg.cycle, dSpace = 16;
+  const dStartX = POM_CX - (dots * dSpace - dSpace + 10) / 2 + 5, dY = POM_CY + 58;
+  for (let i = 0; i < dots; i++) {
+    pomCtx.beginPath();
+    pomCtx.arc(dStartX + i * dSpace, dY, 5, 0, 2 * Math.PI);
+    if (i < (pomSessions % pomCfg.cycle)) { pomCtx.fillStyle = mode.color; pomCtx.fill(); }
+    else { pomCtx.strokeStyle = '#d1cfff'; pomCtx.lineWidth = 1.5; pomCtx.stroke(); }
+  }
+}
+
+// ── Animation loop (requestAnimationFrame) ────────────────────────
+function pomLoop(ts) {
+  if (!pomRunning) return;
+  if (pomLastTS === null) pomLastTS = ts;
+  pomAccMs += ts - pomLastTS; pomLastTS = ts;
+  while (pomAccMs >= 1000) {
+    pomAccMs -= 1000; pomRemaining--;
+    document.title = `${pomFmt(pomRemaining)} — ${POM_MODES[pomMode].label} | Equilibra`;
+    if (pomRemaining <= 0) { pomRemaining = 0; pomDraw(); pomOnComplete(); return; }
+  }
+  pomDraw();
+  pomRafId = requestAnimationFrame(pomLoop);
+}
+function pomStartLoop() { pomLastTS = null; pomAccMs = 0; pomRafId = requestAnimationFrame(pomLoop); }
+function pomStopLoop()  { if (pomRafId) { cancelAnimationFrame(pomRafId); pomRafId = null; } }
+
+function pomFmt(s) {
+  return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+}
+
+function pomSetAccent(color) {
+  document.getElementById('pom-start').style.background = color;
+  document.querySelectorAll('.pom-tab.active').forEach(b => b.style.background = color);
+  document.getElementById('pom-apply').style.background = color;
+  document.getElementById('pom-task-add').style.background = color;
+}
+
+function pomInitMode(mode) {
+  pomMode = mode;
+  pomTotal = pomCfg[mode === 'work' ? 'work' : mode === 'short' ? 'short' : 'long'] * 60;
+  pomRemaining = pomTotal; pomRunning = false; pomStopLoop();
+  document.getElementById('pom-start').textContent = '▶';
+  document.title = `${pomFmt(pomRemaining)} — ${POM_MODES[mode].label} | Equilibra`;
+  pomSetAccent(POM_MODES[mode].color); pomDraw();
+}
+
+function pomSwitchMode(mode) {
+  document.querySelectorAll('.pom-tab').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  pomInitMode(mode);
+}
+
+function pomToggle() {
+  pomEnsureAudio();
+  if (pomRunning) {
+    pomRunning = false; pomStopLoop();
+    document.getElementById('pom-start').textContent = '▶'; pomDraw();
+  } else {
+    pomRunning = true; document.getElementById('pom-start').textContent = '⏸'; pomStartLoop();
+  }
+}
+
+function pomOnComplete() {
+  pomRunning = false; pomStopLoop();
+  document.getElementById('pom-start').textContent = '▶';
+  if (pomMode === 'work') {
+    pomCount++; pomSessions++; pomFocusMin += pomCfg.work;
+    document.getElementById('pom-count').textContent = pomCount;
+    document.getElementById('pom-focus').textContent = pomFocusMin >= 60 ? `${(pomFocusMin/60).toFixed(1)}h` : `${pomFocusMin}m`;
+    pomPlayAlert(700);
+    const next = (pomSessions % pomCfg.cycle === 0) ? 'long' : 'short';
+    pomToast(`🍅 Pomodoro #${pomCount} done! Time for a ${next === 'long' ? 'long' : 'short'} break.`);
+    if (pomCfg.autoStart) setTimeout(() => { pomSwitchMode(next); pomToggle(); }, 900);
+    else setTimeout(() => pomSwitchMode(next), 900);
+  } else {
+    pomPlayAlert(500); pomToast('☕ Break over! Back to focusing.');
+    if (pomCfg.autoStart) setTimeout(() => { pomSwitchMode('work'); pomToggle(); }, 900);
+    else setTimeout(() => pomSwitchMode('work'), 900);
+  }
+}
+
+// ── Sound engine ──────────────────────────────────────────────────
+function pomEnsureAudio() {
+  if (!pomAudioCtx) pomAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (pomAudioCtx.state === 'suspended') pomAudioCtx.resume();
+}
+function pomStopSound() {
+  if (pomSoundSrc)  { try { pomSoundSrc.stop(); } catch(e){} pomSoundSrc.disconnect(); pomSoundSrc = null; }
+  if (pomSoundGain) { pomSoundGain.disconnect(); pomSoundGain = null; }
+}
+function pomBuildWhite() {
+  const sr = pomAudioCtx.sampleRate, len = sr * 3;
+  const buf = pomAudioCtx.createBuffer(1, len, sr), d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  const src = pomAudioCtx.createBufferSource(); src.buffer = buf; src.loop = true; return src;
+}
+function pomBuildBrown() {
+  const sr = pomAudioCtx.sampleRate, len = sr * 3;
+  const buf = pomAudioCtx.createBuffer(1, len, sr), d = buf.getChannelData(0);
+  let last = 0;
+  for (let i = 0; i < len; i++) { last = (last + 0.02*(Math.random()*2-1))/1.02; d[i] = Math.max(-1,Math.min(1,last*3.5)); }
+  const src = pomAudioCtx.createBufferSource(); src.buffer = buf; src.loop = true; return src;
+}
+function pomBuildRain() {
+  const sr = pomAudioCtx.sampleRate, len = sr * 4;
+  const buf = pomAudioCtx.createBuffer(1, len, sr), d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  const src = pomAudioCtx.createBufferSource(); src.buffer = buf; src.loop = true;
+  const hp = pomAudioCtx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 300;
+  const bp = pomAudioCtx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1400; bp.Q.value = 0.7;
+  const lp = pomAudioCtx.createBiquadFilter(); lp.type = 'lowpass';  lp.frequency.value = 4000;
+  src.connect(hp); hp.connect(bp); bp.connect(lp);
+  return { src, lastNode: lp };
+}
+function pomPlaySound(type) {
+  pomEnsureAudio(); pomStopSound();
+  if (type === 'silent') return;
+  pomSoundGain = pomAudioCtx.createGain(); pomSoundGain.gain.value = pomVolume; pomSoundGain.connect(pomAudioCtx.destination);
+  if (type === 'white')      { pomSoundSrc = pomBuildWhite(); pomSoundSrc.connect(pomSoundGain); }
+  else if (type === 'brown') { pomSoundSrc = pomBuildBrown(); pomSoundSrc.connect(pomSoundGain); }
+  else if (type === 'rain')  { const r = pomBuildRain(); pomSoundSrc = r.src; r.lastNode.connect(pomSoundGain); }
+  pomSoundSrc.start();
+}
+function pomPlayAlert(freq) {
+  pomEnsureAudio();
+  const osc = pomAudioCtx.createOscillator(), gain = pomAudioCtx.createGain();
+  osc.connect(gain); gain.connect(pomAudioCtx.destination);
+  osc.frequency.value = freq; osc.type = 'sine';
+  gain.gain.setValueAtTime(0.35, pomAudioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, pomAudioCtx.currentTime + 1.4);
+  osc.start(); osc.stop(pomAudioCtx.currentTime + 1.4);
+}
+
+// ── Toast ─────────────────────────────────────────────────────────
+let pomToastTimer;
+function pomToast(msg) {
+  const t = document.getElementById('pom-toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(pomToastTimer);
+  pomToastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── Task list ──────────────────────────────────────────────────────
+let pomTasks = [];
+function pomEsc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function pomRenderTasks() {
+  const list = document.getElementById('pom-task-list');
+  list.innerHTML = '';
+  document.getElementById('pom-done').textContent = pomTasks.filter(t=>t.done).length;
+  pomTasks.forEach((task, i) => {
+    const li = document.createElement('li');
+    li.className = 'pom-task-item' + (task.done ? ' done' : '');
+    li.innerHTML = `<div class="pom-task-check"></div><span class="pom-task-text">${pomEsc(task.text)}</span><button class="pom-task-del">✕</button>`;
+    li.querySelector('.pom-task-check').onclick = () => { pomTasks[i].done = !pomTasks[i].done; pomRenderTasks(); };
+    li.querySelector('.pom-task-text').onclick  = () => { pomTasks[i].done = !pomTasks[i].done; pomRenderTasks(); };
+    li.querySelector('.pom-task-del').onclick   = e  => { e.stopPropagation(); pomTasks.splice(i,1); pomRenderTasks(); };
+    list.appendChild(li);
+  });
+}
+function pomAddTask() {
+  const inp = document.getElementById('pom-task-input'), v = inp.value.trim();
+  if (!v) return; pomTasks.push({ text: v, done: false }); inp.value = ''; pomRenderTasks();
+}
+
+// ── Init (called once when page first becomes visible) ─────────────
+function initPomodoro() {
+  if (pomReady) { pomDraw(); return; }
+  pomReady = true;
+  pomCanvas = document.getElementById('pomCanvas');
+  const DPR = window.devicePixelRatio || 1;
+  pomCanvas.width  = POM_SIZE * DPR; pomCanvas.height = POM_SIZE * DPR;
+  pomCanvas.style.width = POM_SIZE + 'px'; pomCanvas.style.height = POM_SIZE + 'px';
+  pomCtx = pomCanvas.getContext('2d'); pomCtx.scale(DPR, DPR);
+
+  document.getElementById('pom-canvas-wrap').addEventListener('click', pomToggle);
+  document.getElementById('pom-start').addEventListener('click', e => { e.stopPropagation(); pomToggle(); });
+  document.getElementById('pom-reset').addEventListener('click', () => pomInitMode(pomMode));
+  document.getElementById('pom-skip').addEventListener('click', () => { pomStopLoop(); pomRunning = false; pomOnComplete(); });
+
+  document.querySelectorAll('.pom-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.pom-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active'); pomSwitchMode(btn.dataset.mode);
+    });
+  });
+
+  document.querySelectorAll('.pom-sound-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.pom-sound-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active'); pomPlaySound(btn.dataset.sound);
+    });
+  });
+
+  document.getElementById('pom-volume').addEventListener('input', function() {
+    pomVolume = this.value / 100;
+    document.getElementById('pom-vol-val').textContent = `${this.value}%`;
+    if (pomSoundGain) pomSoundGain.gain.setTargetAtTime(pomVolume, pomAudioCtx.currentTime, 0.05);
+  });
+
+  document.querySelectorAll('.pom-step-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      if (!input) return;
+      let val = Math.min(parseInt(input.max)||999, Math.max(parseInt(input.min)||1, (parseInt(input.value)||0) + parseInt(btn.dataset.delta)));
+      input.value = val;
+      input.style.borderColor = '#6a5cff';
+      setTimeout(() => input.style.borderColor = '', 600);
+    });
+  });
+
+  document.getElementById('pom-apply').addEventListener('click', () => {
+    pomCfg = {
+      work:      Math.max(1, parseInt(document.getElementById('pom-set-work').value)  || 25),
+      short:     Math.max(1, parseInt(document.getElementById('pom-set-short').value) || 5),
+      long:      Math.max(1, parseInt(document.getElementById('pom-set-long').value)  || 15),
+      cycle:     Math.max(1, parseInt(document.getElementById('pom-set-cycle').value) || 4),
+      autoStart: document.getElementById('pom-set-auto').value === 'on',
+    };
+    pomInitMode(pomMode); pomToast('✅ Intervals updated!');
+  });
+
+  document.getElementById('pom-task-add').addEventListener('click', pomAddTask);
+  document.getElementById('pom-task-input').addEventListener('keydown', e => { if (e.key === 'Enter') pomAddTask(); });
+
+  pomInitMode('work');
+}
+
+function leavePomodoroPage() {
+  if (pomRunning) { pomRunning = false; pomStopLoop(); document.getElementById('pom-start').textContent = '▶'; }
+  pomStopSound();
+  document.title = 'Equilibra';
+  showPage('dashboard');
+}
+</script>
+</body>
+</html>

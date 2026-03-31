@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Equilibra</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- FLOATING BANNER -->
+<div class="floating-banner">
+    <div class="banner-content">
+        Thought of the Day: You don’t have to do everything today.
+    </div>
+</div>
+
+<!-- HOME -->
+<section id="home" class="page active">
+    <div class="intro-strip">
+        <h1 class="intro-logo">EQUILIBRA</h1>
+        <p class="intro-line">
+            A space where learning adapts to <span>you</span>, not the other way around.
+        </p>
+        <p class="intro-subline">
+            Check in. Find your rhythm. Study with balance.
+        </p>
+        <button class="primary-btn" onclick="showPage('auth')">
+            Login / Sign Up
+        </button>
+    </div>
+</section>
+
+<!-- LOGIN -->
+<section id="auth" class="page">
+    <div class="auth-wrapper">
+        <div class="auth-container">
+            <h2>Login or create an account</h2>
+
+            <input type="text" placeholder="Name">
+            <input type="email" placeholder="Email">
+            <input type="password" placeholder="Password">
+
+            <button class="primary-btn" onclick="loginUser()">Continue</button>
+            <button class="secondary-btn" onclick="showPage('home')">Back</button>
+        </div>
+    </div>
+</section>
+
+<!-- WELCOME -->
+<section id="welcome" class="page">
+    <div class="welcome-container">
+        <h1 id="welcome-title">Welcome to Equilibra</h1>
+        <p>This space is designed to support you, not pressure you.</p>
+        <button class="primary-btn" onclick="showPage('dashboard')">
+            Enter your space
+        </button>
+    </div>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="page dashboard">
+
+    <!-- LEFT NAV -->
+    <aside class="sidebar">
+        <h2 class="sidebar-logo">EQUILIBRA</h2>
+        <nav>
+            <a class="active">Dashboard</a>
+            <a>My Courses</a>
+            <a>Assignments</a>
+            <a>Study Materials</a>
+            <a>Focus Mode</a>
+            <a>Gentle Tasks</a>
+        </nav>
+    </aside>
+
+    <!-- CENTER CONTENT -->
+    <main class="dashboard-main">
+
+        <h1>Your Learning Space</h1>
+
+        <!-- COURSES -->
+        <section class="courses">
+            <h3>Course Overview</h3>
+            <div class="course-grid">
+                <div class="course-card blue">Computer Networks</div>
+                <div class="course-card purple">Computer Architecture</div>
+                <div class="course-card teal">Linear Algebra</div>
+            </div>
+        </section>
+
+        <!-- CALENDAR -->
+        <section class="calendar">
+            <h3>Calendar</h3>
+            <div class="calendar-box">
+                <p><strong>February 2026</strong></p>
+                <p>Upcoming labs and deadlines will appear here.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- RIGHT PANEL (EQUILIBRA FEATURES) -->
+    <aside class="features">
+        <h3>Equilibra Tools</h3>
+        <ul>
+            <li>🌱 Student Mirror</li>
+            <li>🐼 Nemo Mood Buddy</li>
+            <li>🎧 Sound Space</li>
+            <li>📊 Strain Spectrum</li>
+            <li>🧘 Regulation Space</li>
+        </ul>
+    </aside>
+
+</section>
+
+<script src="logic.js"></script>
+</body>
+</html>

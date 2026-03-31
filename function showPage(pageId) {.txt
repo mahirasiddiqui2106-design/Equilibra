@@ -1,0 +1,41 @@
+function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => {
+        p.classList.remove('active');
+    });
+    document.getElementById(pageId).classList.add('active');
+
+    if (pageId === "welcome") {
+        typeWelcomeText();
+    }
+}
+
+function loginUser() {
+    showPage('welcome');
+}
+
+document.querySelectorAll(".mirror-options button").forEach(btn => {
+    btn.onclick = () => {
+        document.getElementById("mirror-response").textContent =
+            "Thanks for checking in.";
+        document.getElementById("mirror-plan").textContent =
+            "Equilibra will now adapt support based on your mood.";
+        document.getElementById("nemo").classList.add("show");
+    };
+});
+function typeWelcomeText() {
+    const text = "Welcome to Equilibra!";
+    const title = document.getElementById("welcome-title");
+    let index = 0;
+
+    title.textContent = "";
+
+    const typing = setInterval(() => {
+        if (index < text.length) {
+            title.textContent += text.charAt(index);
+            index++;
+        } else {
+            clearInterval(typing);
+        }
+    }, 90);
+}
+

@@ -1,0 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg,#6a5cff,#7b8cff,#3ccfcf);
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* PAGE SYSTEM */
+.page {
+    display: none;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+}
+
+.page.active {
+    display: flex;
+}
+
+/* FLOATING BANNER */
+.floating-banner {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 60px;
+    background: rgba(0,0,0,0.15);
+    color: white;
+    z-index: 10;
+}
+
+.banner-content {
+    line-height: 60px;
+    white-space: nowrap;
+    animation: slide 18s linear infinite;
+}
+
+@keyframes slide {
+    from { transform: translateX(100%); }
+    to { transform: translateX(-100%); }
+}
+
+/* LANDING */
+.landing-content {
+    text-align: center;
+}
+
+.logo {
+    font-size: 72px;
+    color: white;
+    margin-bottom: 30px;
+    animation: fadeDown 1.4s ease;
+}
+
+@keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* BUTTONS */
+.primary-btn {
+    padding: 14px 36px;
+    border-radius: 30px;
+    border: none;
+    background: white;
+    color: #6a5cff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.secondary-btn {
+    margin-top: 20px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+/* LOGIN */
+.login-card {
+    background: white;
+    padding: 40px 36px;
+    border-radius: 24px;
+    width: 360px;
+    text-align: center;
+}
+
+.login-card h2 {
+    margin-bottom: 12px;
+}
+
+.login-sub {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 22px;
+}
+
+.login-card input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+}
+
+.link,
+.link-btn {
+    font-size: 14px;
+    color: #6a5cff;
+    cursor: pointer;
+    margin-top: 10px;
+    background: none;
+    border: none;
+}
+
+#otp-box {
+    display: none;
+    margin-top: 16px;
+}
+
+/* WELCOME */
+.welcome-container {
+    text-align: center;
+}
+
+#welcome-title {
+    font-size: 56px;
+    font-style: italic;
+    color: white;
+    min-height: 70px;
+    margin-bottom: 30px;
+}

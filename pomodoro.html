@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pomodoro Timer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #111827;
+      --card: #1f2937;
+      --card2: #374151;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --accent: #ef4444;
+      --radius: 16px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 16px 60px;
+    }
+
+    /* ── Header ── */
+    .header { text-align: center; margin-bottom: 24px; }
+    .header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }
+    .header p  { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex; gap: 6px;
+      background: var(--card);
+      padding: 5px; border-radius: 50px;
+      margin-bottom: 28px;
+    }
+    .tab-btn {
+      border: none; background: transparent; color: var(--muted);
+      padding: 8px 18px; border-radius: 50px; cursor: pointer;
+      font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 500;
+      transition: all 0.25s;
+    }
+    .tab-btn.active { background: var(--accent); color: #fff; }
+
+    /* ── Canvas wrapper ── */
+    .canvas-wrap {
+      position: relative;
+      margin-bottom: 28px;
+      cursor: pointer;
+    }
+    #timerCanvas { display: block; }
+    .canvas-wrap .click-hint {
+      position: absolute; bottom: -20px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem; color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 32px;
+    }
+    .btn-icon {
+      background: var(--card); border: none; color: var(--text);
+      width: 46px; height: 46px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s, transform 0.1s;
+      font-size: 1rem;
+    }
+    .btn-icon:hover { background: var(--card2); transform: scale(1.07); }
+    .btn-main {
+      background: var(--accent); border: none; color: #fff;
+      width: 68px; height: 68px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1.5rem;
+      transition: transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 0 28px color-mix(in srgb, var(--accent) 50%, transparent);
+    }
+    .btn-main:hover { transform: scale(1.06); }
+
+    /* ── Sound panel ── */
+    .sound-panel {
+      background: var(--card); border-radius: var(--radius);
+      padding: 16px 20px; margin-bottom: 20px;
+      width: 100%; max-width: 460px;
+    }
+    .sound-panel .panel-title {
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px;
+      color: var(--muted); margin-bottom: 12px;
+    }
+    .sound-options {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;
+    }
+    .sound-btn {
+      border: 1.5px solid var(--card2); background: transparent; color: var(--muted);
+      padding: 7px 14px; border-radius: 50px; cursor: pointer;
+      font-family: 'Inter', sans-serif; font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+    .sound-btn:hover { border-color: var(--accent); color: var(--text); }
+    .sound-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .volume-row {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .volume-row label { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+    .volume-slider {
+      flex: 1; -webkit-appearance: none; appearance: none;
+      height: 4px; border-radius: 2px;
+      background: var(--card2); outline: none; cursor: pointer;
+    }
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 16px; height: 16px;
+      border-radius: 50%; background: var(--accent); cursor: pointer;
+    }
+
+    /* ── Settings panel ── */
+    .settings-panel {
+      background: var(--card); border-radius: var(--radius);
+      padding: 16px 20px; margin-bottom: 20px;
+      width: 100%; max-width: 460px;
+    }
+    .panel-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px;
+    }
+    .panel-header span {
+      font-size: 0.72rem; text-transform: uppercase;
+      letter-spacing: 2px; color: var(--muted);
+    }
+    .collapse-btn {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: 0.8rem; padding: 2px 8px;
+      border-radius: 6px; transition: background 0.2s;
+    }
+    .collapse-btn:hover { background: var(--card2); }
+
+    .settings-body { display: block; }
+    .settings-body.hidden { display: none; }
+
+    .settings-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+      margin-bottom: 12px;
+    }
+    .setting-field label {
+      display: block; font-size: 0.68rem; color: var(--muted);
+      margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .setting-field input {
+      width: 100%; background: var(--bg); border: 1.5px solid transparent;
+      border-radius: 8px; padding: 8px 10px; color: var(--text);
+      font-family: 'Space Mono', monospace; font-size: 1rem;
+      text-align: center; outline: none; transition: border-color 0.2s;
+    }
+    .setting-field input:focus { border-color: var(--accent); }
+
+    .settings-row2 {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .settings-apply {
+      background: var(--accent); border: none; color: #fff;
+      padding: 9px 22px; border-radius: 8px; cursor: pointer;
+      font-family: 'Inter', sans-serif; font-size: 0.85rem;
+      transition: opacity 0.2s;
+    }
+    .settings-apply:hover { opacity: 0.85; }
+
+    /* ── Stats ── */
+    .stats {
+      display: flex; gap: 12px; margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--card); border-radius: var(--radius);
+      padding: 14px 22px; text-align: center; flex: 1;
+    }
+    .stat-card .val {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.7rem; font-weight: 700;
+    }
+    .stat-card .lbl {
+      font-size: 0.68rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 1.5px; margin-top: 3px;
+    }
+
+    /* ── Tasks ── */
+    .task-section { width: 100%; max-width: 460px; }
+    .task-section h2 {
+      font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 2px; color: var(--muted); margin-bottom: 10px;
+    }
+    .task-input-wrap { display: flex; gap: 8px; margin-bottom: 12px; }
+    .task-input {
+      flex: 1; background: var(--card); border: 1.5px solid transparent;
+      border-radius: 10px; padding: 10px 14px; color: var(--text);
+      font-family: 'Inter', sans-serif; font-size: 0.88rem; outline: none;
+      transition: border-color 0.2s;
+    }
+    .task-input:focus { border-color: var(--accent); }
+    .task-add-btn {
+      background: var(--accent); border: none; color: #fff;
+      padding: 10px 18px; border-radius: 10px; cursor: pointer;
+      font-size: 1.2rem; transition: opacity 0.2s;
+    }
+    .task-add-btn:hover { opacity: 0.85; }
+    .task-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .task-item {
+      background: var(--card); border-radius: 10px;
+      padding: 10px 14px; display: flex; align-items: center; gap: 10px;
+    }
+    .task-check {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid var(--muted); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .task-item.done .task-check { background: var(--accent); border-color: var(--accent); }
+    .task-item.done .task-check::after { content: '✓'; color: #fff; font-size: 10px; font-weight: 700; }
+    .task-text { flex: 1; font-size: 0.88rem; cursor: pointer; }
+    .task-item.done .task-text { text-decoration: line-through; color: var(--muted); }
+    .task-del {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: 0.9rem; padding: 2px 6px;
+      border-radius: 6px; transition: color 0.2s, background 0.2s;
+    }
+    .task-del:hover { color: var(--accent); background: rgba(239,68,68,0.12); }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--card2); color: var(--text);
+      padding: 12px 26px; border-radius: 50px;
+      font-size: 0.88rem; font-weight: 500;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+      z-index: 999; white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 480px) {
+      .settings-grid { grid-template-columns: 1fr 1fr; }
+      .stats { gap: 8px; }
+      .stat-card { padding: 12px 14px; }
+      .stat-card .val { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🍅 Pomodoro</h1>
+  <p>Stay focused. Rest smart. Click canvas to start/pause.</p>
+</div>
+
+<!-- Mode tabs -->
+<div class="tabs">
+  <button class="tab-btn active" data-mode="work">Focus</button>
+  <button class="tab-btn" data-mode="short">Short Break</button>
+  <button class="tab-btn" data-mode="long">Long Break</button>
+</div>
+
+<!-- Canvas -->
+<div class="canvas-wrap" id="canvas-wrap">
+  <canvas id="timerCanvas" width="300" height="300"></canvas>
+</div>
+
+<!-- Controls -->
+<div class="controls">
+  <button class="btn-icon" id="skip-btn" title="Skip to next">⏭</button>
+  <button class="btn-main" id="start-btn" title="Start / Pause">▶</button>
+  <button class="btn-icon" id="reset-btn" title="Reset">↺</button>
+</div>
+
+<!-- Sound panel -->
+<div class="sound-panel">
+  <div class="panel-title">🔊 Ambient Sound</div>
+  <div class="sound-options">
+    <button class="sound-btn active" data-sound="silent">🔇 Silent</button>
+    <button class="sound-btn" data-sound="white">〰 White Noise</button>
+    <button class="sound-btn" data-sound="brown">🌊 Brown Noise</button>
+    <button class="sound-btn" data-sound="rain">🌧 Rain</button>
+  </div>
+  <div class="volume-row">
+    <label>Volume</label>
+    <input type="range" class="volume-slider" id="volume" min="0" max="100" value="40"/>
+    <span id="vol-val" style="font-size:0.75rem;color:var(--muted);min-width:32px">40%</span>
+  </div>
+</div>
+
+<!-- Settings panel -->
+<div class="settings-panel">
+  <div class="panel-header">
+    <span>⚙ Timer Settings</span>
+    <button class="collapse-btn" id="collapse-btn">▲ Hide</button>
+  </div>
+  <div class="settings-body" id="settings-body">
+    <div class="settings-grid">
+      <div class="setting-field">
+        <label>Focus (min)</label>
+        <input type="number" id="set-work" value="25" min="1" max="120"/>
+      </div>
+      <div class="setting-field">
+        <label>Short Break</label>
+        <input type="number" id="set-short" value="5" min="1" max="60"/>
+      </div>
+      <div class="setting-field">
+        <label>Long Break</label>
+        <input type="number" id="set-long" value="15" min="1" max="120"/>
+      </div>
+    </div>
+    <div class="settings-row2">
+      <div class="setting-field">
+        <label>Sessions → Long Break</label>
+        <input type="number" id="set-cycle" value="4" min="1" max="10"/>
+      </div>
+      <div class="setting-field">
+        <label>Auto-start Breaks</label>
+        <select id="set-auto" style="width:100%;background:var(--bg);border:1.5px solid transparent;border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Inter',sans-serif;font-size:0.88rem;outline:none;">
+          <option value="off">Off</option>
+          <option value="on">On</option>
+        </select>
+      </div>
+    </div>
+    <button class="settings-apply" id="settings-apply">Apply Settings</button>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stat-card">
+    <div class="val" id="pomodoro-count">0</div>
+    <div class="lbl">Pomodoros</div>
+  </div>
+  <div class="stat-card">
+    <div class="val" id="focus-time">0m</div>
+    <div class="lbl">Focus Time</div>
+  </div>
+  <div class="stat-card">
+    <div class="val" id="tasks-done">0</div>
+    <div class="lbl">Done</div>
+  </div>
+</div>
+
+<!-- Tasks -->
+<div class="task-section">
+  <h2>📋 Tasks</h2>
+  <div class="task-input-wrap">
+    <input class="task-input" id="task-input" type="text" placeholder="Add a task…" maxlength="80"/>
+    <button class="task-add-btn" id="task-add">+</button>
+  </div>
+  <ul class="task-list" id="task-list"></ul>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+//  CANVAS SETUP
+// ════════════════════════════════════════════════════════════════════════════
+const canvas = document.getElementById('timerCanvas');
+const ctx    = canvas.getContext('2d');
+
+// Hi-DPI support
+const DPR = window.devicePixelRatio || 1;
+const SIZE = 300;
+canvas.width  = SIZE * DPR;
+canvas.height = SIZE * DPR;
+canvas.style.width  = SIZE + 'px';
+canvas.style.height = SIZE + 'px';
+ctx.scale(DPR, DPR);
+
+const CX = SIZE / 2, CY = SIZE / 2;
+const OUTER_R = 128;   // outer ring radius
+const TRACK_W = 14;    // stroke width
+
+// ════════════════════════════════════════════════════════════════════════════
+//  TIMER STATE
+// ════════════════════════════════════════════════════════════════════════════
+const MODES = {
+  work:  { label: 'Focus',       color: '#ef4444', glow: 'rgba(239,68,68,0.55)',   shadow: 'rgba(239,68,68,0.25)'  },
+  short: { label: 'Short Break', color: '#10b981', glow: 'rgba(16,185,129,0.55)',  shadow: 'rgba(16,185,129,0.25)' },
+  long:  { label: 'Long Break',  color: '#3b82f6', glow: 'rgba(59,130,246,0.55)',  shadow: 'rgba(59,130,246,0.25)' },
+};
+
+let cfg = { work: 25, short: 5, long: 15, cycle: 4, autoStart: false };
+
+let currentMode   = 'work';
+let totalSeconds  = cfg.work * 60;
+let remaining     = totalSeconds;
+let running       = false;
+let rafId         = null;
+let lastTimestamp = null;
+let accMs         = 0;        // accumulated milliseconds between ticks
+
+let pomodoroCount = 0;
+let focusMinutes  = 0;
+let sessionsDone  = 0;        // completed work sessions in current cycle
+
+// ════════════════════════════════════════════════════════════════════════════
+//  CANVAS DRAWING  — this is the core "Canvas + Drawing in JS" implementation
+// ════════════════════════════════════════════════════════════════════════════
+function draw() {
+  // Clear
+  ctx.clearRect(0, 0, SIZE, SIZE);
+
+  const mode    = MODES[currentMode];
+  const progress = remaining / totalSeconds;   // 1 = full, 0 = done
+  const startA  = -Math.PI / 2;                // top of circle
+  const sweepA  = 2 * Math.PI * progress;
+
+  // ── 1. Outer glow shadow (drawn as a slightly larger arc first) ──────────
+  ctx.save();
+  ctx.shadowColor = mode.glow;
+  ctx.shadowBlur  = 20;
+  ctx.beginPath();
+  ctx.arc(CX, CY, OUTER_R, startA, startA + sweepA);
+  ctx.strokeStyle = mode.color;
+  ctx.lineWidth   = TRACK_W;
+  ctx.lineCap     = 'round';
+  ctx.stroke();
+  ctx.restore();
+
+  // ── 2. Track ring (background) ────────────────────────────────────────────
+  ctx.beginPath();
+  ctx.arc(CX, CY, OUTER_R, 0, 2 * Math.PI);
+  ctx.strokeStyle = '#1f2937';
+  ctx.lineWidth   = TRACK_W;
+  ctx.stroke();
+
+  // ── 3. Progress arc ───────────────────────────────────────────────────────
+  if (progress > 0) {
+    ctx.beginPath();
+    ctx.arc(CX, CY, OUTER_R, startA, startA + sweepA);
+    ctx.strokeStyle = mode.color;
+    ctx.lineWidth   = TRACK_W;
+    ctx.lineCap     = 'round';
+    ctx.stroke();
+  }
+
+  // ── 4. Inner circle fill ──────────────────────────────────────────────────
+  ctx.beginPath();
+  ctx.arc(CX, CY, OUTER_R - TRACK_W / 2 - 6, 0, 2 * Math.PI);
+  ctx.fillStyle = '#111827';
+  ctx.fill();
+
+  // ── 5. Mode label (top) ───────────────────────────────────────────────────
+  ctx.fillStyle   = mode.color;
+  ctx.font        = '500 12px Inter, sans-serif';
+  ctx.textAlign   = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.letterSpacing = '2px';
+  ctx.fillText(mode.label.toUpperCase(), CX, CY - 38);
+
+  // ── 6. Time text (center) — Space Mono for monospaced digits ─────────────
+  ctx.fillStyle    = '#f3f4f6';
+  ctx.font         = 'bold 52px "Space Mono", monospace';
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(fmt(remaining), CX, CY + 4);
+
+  // ── 7. Sub-label: "click to pause" or "paused" ───────────────────────────
+  ctx.fillStyle    = '#6b7280';
+  ctx.font         = '400 11px Inter, sans-serif';
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(running ? 'click to pause' : (remaining < totalSeconds ? 'paused — click to resume' : 'click to start'), CX, CY + 40);
+
+  // ── 8. Session dots (bottom) ──────────────────────────────────────────────
+  const dotCount  = cfg.cycle;
+  const dotR      = 5;
+  const dotSpacing = 16;
+  const dotsW     = dotCount * dotSpacing - dotSpacing + dotR * 2;
+  const dotStartX = CX - dotsW / 2 + dotR;
+  const dotY      = CY + 60;
+
+  for (let i = 0; i < dotCount; i++) {
+    const filled = i < (sessionsDone % cfg.cycle);
+    ctx.beginPath();
+    ctx.arc(dotStartX + i * dotSpacing, dotY, dotR, 0, 2 * Math.PI);
+    if (filled) {
+      ctx.fillStyle = mode.color;
+      ctx.fill();
+    } else {
+      ctx.strokeStyle = '#374151';
+      ctx.lineWidth   = 2;
+      ctx.stroke();
+    }
+  }
+
+  // ── 9. Tick marks around the ring ─────────────────────────────────────────
+  const tickCount = 60;
+  const tickOuter = OUTER_R + 10;
+  const tickInner = OUTER_R + 4;
+  ctx.strokeStyle = '#374151';
+  ctx.lineWidth   = 1;
+  for (let i = 0; i < tickCount; i++) {
+    const angle = (i / tickCount) * 2 * Math.PI - Math.PI / 2;
+    const isMajor = i % 5 === 0;
+    const r1 = isMajor ? tickOuter + 2 : tickOuter;
+    const r2 = isMajor ? tickInner - 2 : tickInner;
+    ctx.beginPath();
+    ctx.moveTo(CX + r1 * Math.cos(angle), CY + r1 * Math.sin(angle));
+    ctx.lineTo(CX + r2 * Math.cos(angle), CY + r2 * Math.sin(angle));
+    ctx.strokeStyle = isMajor ? '#4b5563' : '#374151';
+    ctx.lineWidth   = isMajor ? 1.5 : 0.8;
+    ctx.stroke();
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  TIMER LOOP (using requestAnimationFrame for smooth canvas updates)
+// ════════════════════════════════════════════════════════════════════════════
+function loop(timestamp) {
+  if (!running) return;
+  if (lastTimestamp === null) lastTimestamp = timestamp;
+
+  accMs += timestamp - lastTimestamp;
+  lastTimestamp = timestamp;
+
+  // Tick every full second
+  while (accMs >= 1000) {
+    accMs -= 1000;
+    remaining--;
+    document.title = `${fmt(remaining)} — ${MODES[currentMode].label}`;
+    if (remaining <= 0) {
+      remaining = 0;
+      draw();
+      onComplete();
+      return;
+    }
+  }
+
+  draw();
+  rafId = requestAnimationFrame(loop);
+}
+
+function startLoop() {
+  lastTimestamp = null;
+  accMs = 0;
+  rafId = requestAnimationFrame(loop);
+}
+
+function stopLoop() {
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════════════════════════════
+function fmt(s) {
+  const m = Math.floor(s / 60).toString().padStart(2, '0');
+  const ss = (s % 60).toString().padStart(2, '0');
+  return `${m}:${ss}`;
+}
+
+function setAccent(color) {
+  document.documentElement.style.setProperty('--accent', color);
+  const startBtn = document.getElementById('start-btn');
+  startBtn.style.background  = color;
+  startBtn.style.boxShadow   = `0 0 28px color-mix(in srgb, ${color} 50%, transparent)`;
+  document.querySelectorAll('.tab-btn.active').forEach(b => b.style.background = color);
+  document.querySelectorAll('.task-add-btn, .settings-apply').forEach(b => b.style.background = color);
+}
+
+function initMode(mode) {
+  currentMode  = mode;
+  totalSeconds = cfg[mode === 'work' ? 'work' : mode === 'short' ? 'short' : 'long'] * 60;
+  remaining    = totalSeconds;
+  running      = false;
+  stopLoop();
+  lastTimestamp = null; accMs = 0;
+  document.getElementById('start-btn').textContent = '▶';
+  document.title = `${fmt(remaining)} — ${MODES[mode].label}`;
+  setAccent(MODES[mode].color);
+  draw();
+}
+
+function switchMode(mode) {
+  document.querySelectorAll('.tab-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.mode === mode)
+  );
+  initMode(mode);
+}
+
+function onComplete() {
+  running = false;
+  stopLoop();
+  document.getElementById('start-btn').textContent = '▶';
+
+  if (currentMode === 'work') {
+    pomodoroCount++;
+    sessionsDone++;
+    focusMinutes += cfg.work;
+    document.getElementById('pomodoro-count').textContent = pomodoroCount;
+    document.getElementById('focus-time').textContent =
+      focusMinutes >= 60 ? `${(focusMinutes / 60).toFixed(1)}h` : `${focusMinutes}m`;
+
+    playAlert(880);
+    const isLong = sessionsDone % cfg.cycle === 0;
+    const next   = isLong ? 'long' : 'short';
+    showToast(`🍅 Pomodoro #${pomodoroCount} done! Time for a ${isLong ? 'long' : 'short'} break.`);
+
+    if (cfg.autoStart) {
+      setTimeout(() => { switchMode(next); toggleTimer(); }, 1000);
+    } else {
+      setTimeout(() => switchMode(next), 1000);
+    }
+  } else {
+    playAlert(660);
+    showToast('☕ Break over! Back to work.');
+    if (cfg.autoStart) {
+      setTimeout(() => { switchMode('work'); toggleTimer(); }, 1000);
+    } else {
+      setTimeout(() => switchMode('work'), 1000);
+    }
+  }
+}
+
+function toggleTimer() {
+  if (running) {
+    running = false;
+    stopLoop();
+    document.getElementById('start-btn').textContent = '▶';
+    draw();
+  } else {
+    running = true;
+    document.getElementById('start-btn').textContent = '⏸';
+    startLoop();
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  SOUND ENGINE  (Web Audio API — all sounds generated programmatically)
+// ════════════════════════════════════════════════════════════════════════════
+let audioCtx      = null;
+let soundSource   = null;
+let soundGain     = null;
+let currentSound  = 'silent';
+let targetVolume  = 0.4;
+
+function ensureAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function stopSound() {
+  if (soundSource) {
+    try { soundSource.stop(); } catch(e) {}
+    soundSource.disconnect();
+    soundSource = null;
+  }
+  if (soundGain) {
+    soundGain.disconnect();
+    soundGain = null;
+  }
+}
+
+/* ── White Noise: flat random buffer ─────────────────────────────── */
+function buildWhiteNoise() {
+  const SR  = audioCtx.sampleRate;
+  const len = SR * 3;                          // 3-second looping buffer
+  const buf = audioCtx.createBuffer(1, len, SR);
+  const d   = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+
+  const src = audioCtx.createBufferSource();
+  src.buffer = buf;
+  src.loop   = true;
+  return { src, nodes: [] };
+}
+
+/* ── Brown Noise: integrated white noise (1/f²) ──────────────────── */
+function buildBrownNoise() {
+  const SR  = audioCtx.sampleRate;
+  const len = SR * 3;
+  const buf = audioCtx.createBuffer(1, len, SR);
+  const d   = buf.getChannelData(0);
+  let last  = 0;
+  for (let i = 0; i < len; i++) {
+    const wh = Math.random() * 2 - 1;
+    last = (last + 0.02 * wh) / 1.02;
+    d[i] = last * 3.5;                         // amplify to audible level
+    if (d[i] >  1) d[i] =  1;
+    if (d[i] < -1) d[i] = -1;
+  }
+  const src = audioCtx.createBufferSource();
+  src.buffer = buf;
+  src.loop   = true;
+  return { src, nodes: [] };
+}
+
+/* ── Rain: layered bandpass-filtered noise ────────────────────────── */
+function buildRainNoise() {
+  // Rain is simulated by layering white noise through multiple bandpass
+  // filters tuned to the spectral character of rain (300 Hz–4 kHz)
+  const SR  = audioCtx.sampleRate;
+  const len = SR * 4;
+  const buf = audioCtx.createBuffer(1, len, SR);
+  const d   = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+
+  const src = audioCtx.createBufferSource();
+  src.buffer = buf;
+  src.loop   = true;
+
+  // Layer 1: light drizzle (high-shelf filtered)
+  const hp = audioCtx.createBiquadFilter();
+  hp.type  = 'highpass'; hp.frequency.value = 300; hp.Q.value = 0.5;
+
+  // Layer 2: heavier drops (bandpass around 1.5 kHz)
+  const bp1 = audioCtx.createBiquadFilter();
+  bp1.type  = 'bandpass'; bp1.frequency.value = 1500; bp1.Q.value = 0.8;
+
+  // Layer 3: wide presence (lowpass ceiling)
+  const lp = audioCtx.createBiquadFilter();
+  lp.type  = 'lowpass'; lp.frequency.value = 4000; lp.Q.value = 0.5;
+
+  src.connect(hp); hp.connect(bp1); bp1.connect(lp);
+  return { src, nodes: [hp, bp1, lp], lastNode: lp };
+}
+
+function playSound(type) {
+  ensureAudio();
+  stopSound();
+  currentSound = type;
+
+  if (type === 'silent') return;
+
+  let built;
+  if      (type === 'white') built = buildWhiteNoise();
+  else if (type === 'brown') built = buildBrownNoise();
+  else if (type === 'rain')  built = buildRainNoise();
+
+  soundGain = audioCtx.createGain();
+  soundGain.gain.value = targetVolume;
+  soundGain.connect(audioCtx.destination);
+
+  const lastNode = built.lastNode || built.src;
+  if (built.nodes.length === 0) {
+    // white / brown: src → gain
+    built.src.connect(soundGain);
+  } else {
+    // rain: src → filters → gain
+    lastNode.connect(soundGain);
+  }
+
+  soundSource = built.src;
+  soundSource.start();
+}
+
+/* ── Alert beep ────────────────────────────────────────────────────── */
+function playAlert(freq) {
+  ensureAudio();
+  const osc  = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.frequency.value = freq; osc.type = 'sine';
+  gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.4);
+  osc.start(); osc.stop(audioCtx.currentTime + 1.4);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  EVENT WIRING
+// ════════════════════════════════════════════════════════════════════════════
+
+// Canvas click = toggle timer
+document.getElementById('canvas-wrap').addEventListener('click', () => {
+  ensureAudio();
+  toggleTimer();
+});
+
+// Start/pause button
+document.getElementById('start-btn').addEventListener('click', e => {
+  e.stopPropagation();
+  ensureAudio();
+  toggleTimer();
+});
+
+// Reset
+document.getElementById('reset-btn').addEventListener('click', () => initMode(currentMode));
+
+// Skip
+document.getElementById('skip-btn').addEventListener('click', () => {
+  stopLoop(); running = false;
+  onComplete();
+});
+
+// Mode tabs
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    switchMode(btn.dataset.mode);
+  });
+});
+
+// Sound buttons
+document.querySelectorAll('.sound-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sound-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    playSound(btn.dataset.sound);
+  });
+});
+
+// Volume slider
+document.getElementById('volume').addEventListener('input', function() {
+  targetVolume = this.value / 100;
+  document.getElementById('vol-val').textContent = `${this.value}%`;
+  if (soundGain) soundGain.gain.setTargetAtTime(targetVolume, audioCtx.currentTime, 0.05);
+});
+
+// Settings collapse
+document.getElementById('collapse-btn').addEventListener('click', () => {
+  const body = document.getElementById('settings-body');
+  const btn  = document.getElementById('collapse-btn');
+  body.classList.toggle('hidden');
+  btn.textContent = body.classList.contains('hidden') ? '▼ Show' : '▲ Hide';
+});
+
+// Apply settings
+document.getElementById('settings-apply').addEventListener('click', () => {
+  const w = Math.max(1, parseInt(document.getElementById('set-work').value)  || 25);
+  const s = Math.max(1, parseInt(document.getElementById('set-short').value) || 5);
+  const l = Math.max(1, parseInt(document.getElementById('set-long').value)  || 15);
+  const c = Math.max(1, parseInt(document.getElementById('set-cycle').value) || 4);
+  const a = document.getElementById('set-auto').value === 'on';
+  cfg = { work: w, short: s, long: l, cycle: c, autoStart: a };
+  initMode(currentMode);
+  showToast('✅ Settings applied!');
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+//  TASK LIST
+// ════════════════════════════════════════════════════════════════════════════
+let tasks = [];
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderTasks() {
+  const list = document.getElementById('task-list');
+  list.innerHTML = '';
+  document.getElementById('tasks-done').textContent = tasks.filter(t => t.done).length;
+  tasks.forEach((task, i) => {
+    const li = document.createElement('li');
+    li.className = 'task-item' + (task.done ? ' done' : '');
+    li.innerHTML = `
+      <div class="task-check"></div>
+      <span class="task-text">${esc(task.text)}</span>
+      <button class="task-del" title="Remove">✕</button>`;
+    li.querySelector('.task-check').onclick = () => { tasks[i].done = !tasks[i].done; renderTasks(); };
+    li.querySelector('.task-text').onclick  = () => { tasks[i].done = !tasks[i].done; renderTasks(); };
+    li.querySelector('.task-del').onclick   = e  => { e.stopPropagation(); tasks.splice(i,1); renderTasks(); };
+    list.appendChild(li);
+  });
+}
+
+function addTask() {
+  const inp = document.getElementById('task-input');
+  const v   = inp.value.trim();
+  if (!v) return;
+  tasks.push({ text: v, done: false });
+  inp.value = '';
+  renderTasks();
+}
+
+document.getElementById('task-add').onclick = addTask;
+document.getElementById('task-input').addEventListener('keydown', e => { if (e.key === 'Enter') addTask(); });
+
+// ════════════════════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════════════════════
+initMode('work');
+</script>
+</body>
+</html>
