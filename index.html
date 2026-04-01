@@ -717,30 +717,45 @@
 
   <!-- Top bar -->
   <div class="vb-topbar">
+
+    <!-- Left: back to dashboard -->
     <div class="vb-topbar-left">
       <button class="vb-back-btn" onclick="closeVisionBoard()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-        Back
+        Dashboard
       </button>
     </div>
+
+    <!-- Center: title + undo/redo -->
     <div class="vb-topbar-center">
       <span class="vb-topbar-icon">🎯</span>
       <span class="vb-topbar-title">Vision Board</span>
-    </div>
-    <div class="vb-topbar-right">
+      <div class="vb-topbar-sep"></div>
       <button class="vb-topbtn" id="vb-undo-btn" onclick="vbUndo()" title="Undo (Ctrl+Z)" disabled>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg>
       </button>
       <button class="vb-topbtn" id="vb-redo-btn" onclick="vbRedo()" title="Redo (Ctrl+Y)" disabled>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3L21 13"/></svg>
-      </button>
-      <div class="vb-topbar-sep"></div>
-      <button class="vb-clear-topbtn" onclick="vbClearBoard()">Clear All</button>
-      <button class="vb-download-btn" onclick="vbDownload()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Save Image
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3L21 13"/></svg>
       </button>
     </div>
+
+    <!-- Right: actions -->
+    <div class="vb-topbar-right">
+      <button class="vb-clear-topbtn" onclick="vbClearBoard()">Clear</button>
+      <button class="vb-myboards-btn" onclick="vbOpenMyBoards()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        My Boards
+      </button>
+      <button class="vb-save-board-btn" onclick="vbSaveBoard()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save Board
+      </button>
+      <button class="vb-download-btn" onclick="vbDownload()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export PNG
+      </button>
+    </div>
+
   </div>
 
   <!-- Editor: sidebar + canvas + props -->
@@ -823,6 +838,17 @@
             <button class="course-modal-btn secondary" onclick="closeSubmitModal()">Cancel</button>
         </div>
     </div>
+</div>
+
+<!-- ══ MY BOARDS MODAL ═══════════════════════════════════════════════════════ -->
+<div id="vb-myboards-overlay" class="vb-myboards-overlay" onclick="vbCloseMyBoards()">
+  <div class="vb-myboards-modal" onclick="event.stopPropagation()">
+    <div class="vb-myboards-header">
+      <span class="vb-myboards-title">🎯 My Saved Boards</span>
+      <button class="vb-myboards-close" onclick="vbCloseMyBoards()">✕</button>
+    </div>
+    <div id="vb-myboards-body" class="vb-myboards-body"></div>
+  </div>
 </div>
 
 <!-- ══ FORUM MODAL ═══════════════════════════════════════════════════════════ -->

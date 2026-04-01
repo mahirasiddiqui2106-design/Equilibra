@@ -126,7 +126,14 @@ function showPage(pageId) {
     }
 
     if (pageId === "vision-board") {
+        // Hide the fixed banner so the vision board topbar is visible
+        var banner = document.querySelector('.floating-banner');
+        if (banner) banner.style.display = 'none';
         initVisionBoard();
+    } else {
+        // Restore banner for all other pages
+        var banner = document.querySelector('.floating-banner');
+        if (banner) banner.style.display = '';
     }
 }
 
@@ -2897,7 +2904,64 @@ function vbShapesPanelHTML() {
 }
 
 function vbBuildPhotosPanel(ct) {
-  ct.innerHTML = '<div class="vb-panel-heading">Photos</div><p class="vb-panel-hint">Upload your own images</p>';
+  ct.innerHTML = '<div class="vb-panel-heading">Photos</div>';
+
+  // ── Pinterest button
+  var pinterestBtn = document.createElement('button');
+  pinterestBtn.className = 'vb-pinterest-btn';
+  pinterestBtn.innerHTML =
+    '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>' +
+    'Search on Pinterest';
+  pinterestBtn.addEventListener('click', function() {
+    window.open('https://www.pinterest.com/search/pins/?q=vision+board+aesthetic', '_blank', 'noopener');
+    // Show the URL paste row
+    urlRow.style.display = 'block';
+    urlNote.style.display = 'block';
+  });
+  ct.appendChild(pinterestBtn);
+
+  // ── "How to" note (hidden until Pinterest is clicked)
+  var urlNote = document.createElement('div');
+  urlNote.className = 'vb-pinterest-note';
+  urlNote.style.display = 'none';
+  urlNote.innerHTML =
+    '<span class="vb-note-step">1.</span> Find an image on Pinterest<br>' +
+    '<span class="vb-note-step">2.</span> Right-click the image → <em>Copy image address</em><br>' +
+    '<span class="vb-note-step">3.</span> Paste the URL below';
+  ct.appendChild(urlNote);
+
+  // ── URL paste row (hidden until Pinterest is clicked)
+  var urlRow = document.createElement('div');
+  urlRow.className = 'vb-url-row';
+  urlRow.style.display = 'none';
+
+  var urlInp = document.createElement('input');
+  urlInp.type = 'url'; urlInp.placeholder = 'Paste image URL here…';
+  urlInp.className = 'vb-url-input';
+
+  var urlBtn = document.createElement('button');
+  urlBtn.className = 'vb-url-add-btn'; urlBtn.textContent = 'Add';
+  urlBtn.addEventListener('click', function() {
+    var url = urlInp.value.trim();
+    if (!url) return;
+    vbAddImageFromUrl(url);
+    urlInp.value = '';
+  });
+  urlInp.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { urlBtn.click(); }
+  });
+
+  urlRow.appendChild(urlInp);
+  urlRow.appendChild(urlBtn);
+  ct.appendChild(urlRow);
+
+  // ── Divider
+  var div = document.createElement('div');
+  div.className = 'vb-photos-or';
+  div.innerHTML = '<span>or upload from device</span>';
+  ct.appendChild(div);
+
+  // ── Upload zone
   var zone = document.createElement('div');
   zone.className = 'vb-upload-zone';
   zone.innerHTML = '<div class="vb-upload-icon">📷</div><div class="vb-upload-text">Click to upload</div><div class="vb-upload-sub">PNG, JPG, GIF, WebP</div>';
@@ -2916,6 +2980,20 @@ function vbBuildPhotosPanel(ct) {
 
   ct.appendChild(zone);
   ct.appendChild(inp);
+}
+
+function vbAddImageFromUrl(url) {
+  VB.topZ++;
+  var item = {
+    id: 'vb_' + Date.now(), type: 'image',
+    x: 80 + Math.random() * 200, y: 60 + Math.random() * 150,
+    w: 240, h: 180, rotate: 0, opacity: 1, zIndex: VB.topZ,
+    src: url, isUrl: true,
+  };
+  VB.items.push(item);
+  vbRenderItem(item);
+  vbSelect(item.id);
+  vbPushHistory(); vbSaveState();
 }
 
 // ── Background ───────────────────────────────────────
@@ -3738,4 +3816,206 @@ function vbClearBoard() {
 function closeVisionBoard() {
   vbDeselect();
   showPage('dashboard');
+}
+
+// ── Dashboard mini-preview ────────────────────────────
+
+
+
+// ── Saved Boards ─────────────────────────────────────
+// Each saved board: { id, name, savedAt, items, background, topZ, thumbnail }
+// Stored as array in localStorage key 'eq_saved_boards'
+
+function vbGetSavedBoards() {
+  try {
+    return JSON.parse(localStorage.getItem('eq_saved_boards') || '[]');
+  } catch(e) { return []; }
+}
+
+function vbPutSavedBoards(arr) {
+  localStorage.setItem('eq_saved_boards', JSON.stringify(arr));
+}
+
+function vbSaveBoard() {
+  if (VB.items.length === 0) {
+    vbShowToast('Board is empty — add something first!');
+    return;
+  }
+
+  // Prompt for a name
+  var name = prompt('Name this board:', 'My Board ' + (vbGetSavedBoards().length + 1));
+  if (name === null) return; // cancelled
+  name = name.trim() || ('My Board ' + (vbGetSavedBoards().length + 1));
+
+  // Build a tiny thumbnail data-url from the canvas via html2canvas (if available)
+  vbDeselect();
+
+  function persist(thumb) {
+    var boards = vbGetSavedBoards();
+    boards.push({
+      id:        'board_' + Date.now(),
+      name:      name,
+      savedAt:   Date.now(),
+      items:     JSON.parse(JSON.stringify(VB.items)),
+      background: JSON.parse(JSON.stringify(VB.background)),
+      topZ:      VB.topZ,
+      thumbnail: thumb || '',
+    });
+    vbPutSavedBoards(boards);
+    vbShowToast('Board "' + name + '" saved!');
+  }
+
+  if (window.html2canvas) {
+    var canvas = document.getElementById('vb-canvas');
+    html2canvas(canvas, { scale: 0.35, useCORS: true, allowTaint: true, backgroundColor: null })
+      .then(function(c) { persist(c.toDataURL('image/jpeg', 0.7)); })
+      .catch(function()  { persist(''); });
+  } else {
+    persist('');
+  }
+}
+
+function vbOpenMyBoards() {
+  var overlay = document.getElementById('vb-myboards-overlay');
+  if (!overlay) return;
+  overlay.classList.add('active');
+  vbRenderMyBoards();
+}
+
+function vbCloseMyBoards() {
+  var overlay = document.getElementById('vb-myboards-overlay');
+  if (overlay) overlay.classList.remove('active');
+}
+
+function vbRenderMyBoards() {
+  var body = document.getElementById('vb-myboards-body');
+  if (!body) return;
+  body.innerHTML = '';
+
+  var boards = vbGetSavedBoards();
+
+  if (boards.length === 0) {
+    body.innerHTML =
+      '<div class="vb-mb-empty">' +
+      '<div class="vb-mb-empty-icon">🎯</div>' +
+      '<p class="vb-mb-empty-text">No saved boards yet.</p>' +
+      '<p class="vb-mb-empty-sub">Click <strong>Save Board</strong> in the editor to save your work.</p>' +
+      '</div>';
+    return;
+  }
+
+  // Sort newest first
+  boards = boards.slice().sort(function(a, b) { return b.savedAt - a.savedAt; });
+
+  var grid = document.createElement('div');
+  grid.className = 'vb-mb-grid';
+
+  boards.forEach(function(board) {
+    var card = document.createElement('div');
+    card.className = 'vb-mb-card';
+
+    // Thumbnail
+    var thumb = document.createElement('div');
+    thumb.className = 'vb-mb-thumb';
+    if (board.thumbnail) {
+      var img = document.createElement('img');
+      img.src = board.thumbnail;
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;';
+      thumb.appendChild(img);
+    } else {
+      // Render mini version inline
+      thumb.style.background = (board.background && board.background.value) || '#fff';
+      thumb.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;opacity:0.4;font-size:24px;">🎯</div>';
+    }
+
+    // Info row
+    var info = document.createElement('div');
+    info.className = 'vb-mb-info';
+
+    var nameEl = document.createElement('div');
+    nameEl.className = 'vb-mb-name';
+    nameEl.textContent = board.name;
+
+    var meta = document.createElement('div');
+    meta.className = 'vb-mb-meta';
+    var d = new Date(board.savedAt);
+    meta.textContent = d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) +
+                       ' · ' + board.items.length + ' item' + (board.items.length !== 1 ? 's' : '');
+
+    // Actions
+    var actions = document.createElement('div');
+    actions.className = 'vb-mb-actions';
+
+    var loadBtn = document.createElement('button');
+    loadBtn.className = 'vb-mb-btn vb-mb-btn-load';
+    loadBtn.textContent = 'Open';
+    loadBtn.addEventListener('click', function() { vbLoadBoard(board.id); });
+
+    var delBtn = document.createElement('button');
+    delBtn.className = 'vb-mb-btn vb-mb-btn-del';
+    delBtn.textContent = '✕';
+    delBtn.title = 'Delete this board';
+    delBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      vbDeleteSavedBoard(board.id);
+    });
+
+    actions.appendChild(loadBtn);
+    actions.appendChild(delBtn);
+    info.appendChild(nameEl);
+    info.appendChild(meta);
+    info.appendChild(actions);
+
+    card.appendChild(thumb);
+    card.appendChild(info);
+    grid.appendChild(card);
+  });
+
+  body.appendChild(grid);
+}
+
+function vbLoadBoard(id) {
+  var boards = vbGetSavedBoards();
+  var board  = boards.find(function(b) { return b.id === id; });
+  if (!board) return;
+
+  if (VB.items.length > 0) {
+    var ok = confirm('Loading "' + board.name + '" will replace the current board. Continue?');
+    if (!ok) return;
+  }
+
+  VB.items      = JSON.parse(JSON.stringify(board.items));
+  VB.background = JSON.parse(JSON.stringify(board.background));
+  VB.topZ       = board.topZ || 10;
+  VB.history    = [JSON.stringify({ items: VB.items, background: VB.background, topZ: VB.topZ })];
+  VB.histIdx    = 0;
+
+  vbDeselect();
+  vbRenderAll();
+  vbUpdateHistoryBtns();
+  vbSaveState();
+
+  vbCloseMyBoards();
+  vbShowToast('Loaded "' + board.name + '"');
+}
+
+function vbDeleteSavedBoard(id) {
+  var boards = vbGetSavedBoards().filter(function(b) { return b.id !== id; });
+  vbPutSavedBoards(boards);
+  vbRenderMyBoards();
+  vbShowToast('Board deleted');
+}
+
+function vbShowToast(msg) {
+  var t = document.getElementById('vb-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'vb-toast';
+    t.className = 'vb-toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function() { t.classList.remove('show'); }, 2600);
 }
