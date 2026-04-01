@@ -72,6 +72,13 @@ const equilibraFeatures = [
     title: "Pomodoro Timer",
     short: "Work in calm intervals",
     detail: "25–5 cycles tuned to your strain level."
+  },
+  {
+    id: "visionboard",
+    icon: "🎯",
+    title: "Vision Board",
+    short: "Visualise your dreams",
+    detail: "Build a beautiful collage of your goals, affirmations, and dreams."
   }
 ];
 
@@ -116,6 +123,10 @@ function showPage(pageId) {
         requestAnimationFrame(function() {
             requestAnimationFrame(initUnloadCanvas);
         });
+    }
+
+    if (pageId === "vision-board") {
+        initVisionBoard();
     }
 }
 
@@ -199,11 +210,12 @@ function renderEquilibraCards() {
         `;
 
         card.addEventListener("click", () => {
-            if      (feature.id === "mirror")   { showPage("mirror"); }
-            else if (feature.id === "nemo")     { openNemo(); }
-            else if (feature.id === "unload")   { showPage("unload"); }
-            else if (feature.id === "pomodoro") { showPage("pomodoro"); }
-            else                                { toggleEquilibraCard(card); }
+            if      (feature.id === "mirror")      { showPage("mirror"); }
+            else if (feature.id === "nemo")        { openNemo(); }
+            else if (feature.id === "unload")      { showPage("unload"); }
+            else if (feature.id === "pomodoro")    { showPage("pomodoro"); }
+            else if (feature.id === "visionboard") { showPage("vision-board"); }
+            else                                   { toggleEquilibraCard(card); }
         });
         container.appendChild(card);
     });
@@ -1091,11 +1103,12 @@ function renderEquilibraCardsIn(selector) {
             </div>
         `;
         card.addEventListener("click", () => {
-            if      (feature.id === "mirror")   { showPage("mirror"); }
-            else if (feature.id === "nemo")     { openNemo(); }
-            else if (feature.id === "unload")   { showPage("unload"); }
-            else if (feature.id === "pomodoro") { showPage("pomodoro"); }
-            else                                { toggleEquilibraCard(card); }
+            if      (feature.id === "mirror")      { showPage("mirror"); }
+            else if (feature.id === "nemo")        { openNemo(); }
+            else if (feature.id === "unload")      { showPage("unload"); }
+            else if (feature.id === "pomodoro")    { showPage("pomodoro"); }
+            else if (feature.id === "visionboard") { showPage("vision-board"); }
+            else                                   { toggleEquilibraCard(card); }
         });
         container.appendChild(card);
     });
@@ -2651,3 +2664,1078 @@ function resetUnloadAfterRelease() {
     }
 }
 
+
+
+
+// =====================================================
+// VISION BOARD v2  —  Kittl-inspired editor
+// =====================================================
+
+const VB = {
+  CANVAS_W: 900,
+  CANVAS_H: 560,
+  items: [],
+  background: { type: 'solid', value: '#ffffff' },
+  selectedId: null,
+  history: [],
+  histIdx: -1,
+  topZ: 10,
+  scale: 1,
+  currentPanel: 'backgrounds',
+};
+
+// ── Static data ──────────────────────────────────────
+
+const vbBgs = [
+  { type:'solid',    value:'#ffffff',   label:'White'       },
+  { type:'solid',    value:'#fef9ec',   label:'Cream'       },
+  { type:'solid',    value:'#fce4ec',   label:'Blush'       },
+  { type:'solid',    value:'#e8d5f5',   label:'Lavender'    },
+  { type:'solid',    value:'#d4edda',   label:'Sage'        },
+  { type:'solid',    value:'#dbeafe',   label:'Sky Blue'    },
+  { type:'solid',    value:'#ffd6a5',   label:'Peach'       },
+  { type:'solid',    value:'#c8a97e',   label:'Cork'        },
+  { type:'solid',    value:'#2d2d2d',   label:'Charcoal'    },
+  { type:'solid',    value:'#1e1b4b',   label:'Midnight'    },
+  { type:'solid',    value:'#0a0a0a',   label:'Black'       },
+  { type:'gradient', value:'linear-gradient(135deg,#ffecd2,#fcb69f)', label:'Peach Glow'    },
+  { type:'gradient', value:'linear-gradient(135deg,#a18cd1,#fbc2eb)', label:'Aurora'        },
+  { type:'gradient', value:'linear-gradient(135deg,#ff9a9e,#fecfef)', label:'Cotton Candy'  },
+  { type:'gradient', value:'linear-gradient(135deg,#667eea,#764ba2)', label:'Purple Rain'   },
+  { type:'gradient', value:'linear-gradient(135deg,#11998e,#38ef7d)', label:'Emerald'       },
+  { type:'gradient', value:'linear-gradient(135deg,#f093fb,#f5576c)', label:'Flamingo'      },
+  { type:'gradient', value:'linear-gradient(135deg,#4776e6,#8e54e9)', label:'Violet'        },
+  { type:'gradient', value:'linear-gradient(135deg,#2c3e50,#4ca1af)', label:'Dusk'          },
+  { type:'gradient', value:'linear-gradient(135deg,#ffd700,#ff8c00)', label:'Golden Hour'   },
+  { type:'gradient', value:'linear-gradient(135deg,#fc5c7d,#6a3093)', label:'Berry'         },
+  { type:'gradient', value:'linear-gradient(135deg,#43cea2,#185a9d)', label:'Ocean'         },
+  { type:'gradient', value:'linear-gradient(135deg,#f7971e,#ffd200)', label:'Sunrise'       },
+  { type:'gradient', value:'linear-gradient(135deg,#e0c3fc,#8ec5fc)', label:'Dreamy'        },
+];
+
+const vbTextPresets = [
+  { name:'Power Word',    fontFamily:"'Bebas Neue',sans-serif",     fontSize:56, color:'#1a1a2e', fontWeight:'400', fontStyle:'normal', text:'FEARLESS',                        w:280, h:80  },
+  { name:'Affirmation',  fontFamily:"'Dancing Script',cursive",     fontSize:30, color:'#4a2c6b', fontWeight:'600', fontStyle:'normal', text:'I am enough',                    w:260, h:60  },
+  { name:'Italic Quote', fontFamily:"'Playfair Display',serif",     fontSize:18, color:'#2d3748', fontWeight:'400', fontStyle:'italic', text:'"She believed she could, so she did."', w:270, h:80 },
+  { name:'Bold Heading', fontFamily:"'Poppins',sans-serif",         fontSize:34, color:'#1a1a2e', fontWeight:'800', fontStyle:'normal', text:'MY GOALS',                       w:220, h:60  },
+  { name:'Body Note',    fontFamily:"'Poppins',sans-serif",         fontSize:14, color:'#4a5568', fontWeight:'400', fontStyle:'normal', text:'Write your intention here...',   w:220, h:56  },
+  { name:'Year Label',   fontFamily:"'Poppins',sans-serif",         fontSize:13, color:'#9ca3af', fontWeight:'600', fontStyle:'normal', text:'2025  MY YEAR',                 w:180, h:40  },
+];
+
+const vbStickerSections = [
+  { label:'Stars & Energy', items:['⭐','🌟','💫','✨','🔥','💥','⚡','🌈','☀️','🌙'] },
+  { label:'Hearts & Love',  items:['❤️','🧡','💛','💚','💙','💜','🖤','🤍','💗','💝'] },
+  { label:'Goals & Win',    items:['🏆','🎯','💪','🚀','💎','👑','🦁','🌺','🌸','🍀'] },
+  { label:'Vibes & Fun',    items:['🎊','🎉','🎶','🎨','🦋','🌻','🌴','🧘','🌊','🎀'] },
+];
+
+const vbShapeDefs = [
+  { name:'Rectangle', shape:'rect',    vb:'0 0 100 62', path:'<rect x="1" y="1" width="98" height="60" rx="0"/>' },
+  { name:'Rounded',   shape:'rrect',   vb:'0 0 100 62', path:'<rect x="1" y="1" width="98" height="60" rx="14"/>' },
+  { name:'Circle',    shape:'circle',  vb:'0 0 100 100',path:'<circle cx="50" cy="50" r="49"/>' },
+  { name:'Triangle',  shape:'tri',     vb:'0 0 100 87', path:'<polygon points="50,1 99,86 1,86"/>' },
+  { name:'Diamond',   shape:'diamond', vb:'0 0 100 100',path:'<polygon points="50,1 99,50 50,99 1,50"/>' },
+  { name:'Heart',     shape:'heart',   vb:'0 0 100 90', path:'<path d="M50 85C10 62 0 42 0 30 0 15 10 5 25 5 35 5 45 12 50 20 55 12 65 5 75 5 90 5 100 15 100 30 100 42 90 62 50 85Z"/>' },
+  { name:'Star',      shape:'star',    vb:'0 0 100 96', path:'<polygon points="50,2 61,35 98,35 68,57 79,91 50,70 21,91 32,57 2,35 39,35"/>' },
+  { name:'Arrow',     shape:'arrow',   vb:'0 0 100 60', path:'<polygon points="0,20 60,20 60,5 99,30 60,55 60,40 0,40"/>' },
+  { name:'Hexagon',   shape:'hex',     vb:'0 0 100 87', path:'<polygon points="25,1 75,1 99,43 75,86 25,86 1,43"/>' },
+  { name:'Line',      shape:'line',    vb:'0 0 100 12', path:'<line x1="0" y1="6" x2="100" y2="6"/>' },
+];
+
+const vbFontOptions = [
+  { label:'Bebas Neue',       value:"'Bebas Neue',sans-serif"      },
+  { label:'Dancing Script',   value:"'Dancing Script',cursive"     },
+  { label:'Playfair Display', value:"'Playfair Display',serif"     },
+  { label:'Poppins',          value:"'Poppins',sans-serif"         },
+  { label:'Georgia',          value:'Georgia,serif'                },
+  { label:'Arial',            value:'Arial,sans-serif'             },
+];
+
+// ── Init ─────────────────────────────────────────────
+
+function initVisionBoard() {
+  vbLoadState();
+  vbApplyBackground();
+  vbRenderAll();
+  vbUpdateScale();
+  vbSwitchPanel('backgrounds', document.querySelector('.vb-sidetab'));
+  vbSetupHandles();
+  vbUpdateHistoryBtns();
+
+  window.removeEventListener('resize', vbUpdateScale);
+  window.addEventListener('resize', vbUpdateScale);
+
+  // Keyboard shortcuts
+  document.removeEventListener('keydown', vbKeyHandler);
+  document.addEventListener('keydown', vbKeyHandler);
+}
+
+function vbKeyHandler(e) {
+  if (!document.getElementById('vision-board').classList.contains('active')) return;
+  // Ignore if editing text
+  const active = document.activeElement;
+  if (active && active.isContentEditable) return;
+
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); vbUndo(); }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); vbRedo(); }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'd') { e.preventDefault(); vbDuplicate(); }
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    if (VB.selectedId && !(active && active.isContentEditable)) {
+      e.preventDefault(); vbDeleteSelected();
+    }
+  }
+}
+
+function vbSetupHandles() {
+  document.querySelectorAll('.vb-h').forEach(function(h) {
+    h.addEventListener('mousedown', function(e) {
+      e.preventDefault(); e.stopPropagation();
+      vbStartResize(e, h.dataset.h);
+    });
+  });
+  const rot = document.getElementById('vb-rot-handle');
+  if (rot) rot.addEventListener('mousedown', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    vbStartRotate(e);
+  });
+}
+
+function vbUpdateScale() {
+  const area  = document.getElementById('vb-canvas-area');
+  const outer = document.getElementById('vb-canvas-outer');
+  if (!area || !outer) return;
+  const aw = area.clientWidth  - 48;
+  const ah = area.clientHeight - 48;
+  const sc = Math.min(aw / VB.CANVAS_W, ah / VB.CANVAS_H, 1);
+  VB.scale = sc;
+  outer.style.transform = 'scale(' + sc + ')';
+}
+
+// ── Panel switching ───────────────────────────────────
+
+function vbSwitchPanel(name, btn) {
+  VB.currentPanel = name;
+  document.querySelectorAll('.vb-sidetab').forEach(function(t) { t.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  const ct = document.getElementById('vb-panel-content');
+  if (!ct) return;
+  ct.innerHTML = '';
+
+  if (name === 'backgrounds')  ct.innerHTML = vbBgPanelHTML();
+  else if (name === 'text')    ct.innerHTML = vbTextPanelHTML();
+  else if (name === 'stickers') vbBuildStickerPanel(ct);
+  else if (name === 'shapes')  ct.innerHTML = vbShapesPanelHTML();
+  else if (name === 'photos')  vbBuildPhotosPanel(ct);
+}
+
+function vbBgPanelHTML() {
+  var h = '<div class="vb-panel-heading">Backgrounds</div>';
+  h += '<div class="vb-panel-subhead">Solid Colours</div><div class="vb-bg-grid">';
+  vbBgs.forEach(function(bg, i) {
+    if (bg.type !== 'solid') return;
+    h += '<div class="vb-bg-swatch" title="' + bg.label + '" onclick="vbSetBg(' + i + ')" style="background:' + bg.value + '"><span class="vb-bg-label">' + bg.label + '</span></div>';
+  });
+  h += '</div><div class="vb-panel-subhead">Gradients</div><div class="vb-bg-grid">';
+  vbBgs.forEach(function(bg, i) {
+    if (bg.type !== 'gradient') return;
+    h += '<div class="vb-bg-swatch" title="' + bg.label + '" onclick="vbSetBg(' + i + ')" style="background:' + bg.value + '"><span class="vb-bg-label">' + bg.label + '</span></div>';
+  });
+  h += '</div>';
+  h += '<div class="vb-panel-subhead">Custom</div>';
+  h += '<div class="vb-custom-row"><input type="color" id="vb-custom-color" value="#ffffff" oninput="vbSetCustomBg(this.value)"><label for="vb-custom-color">Pick any colour</label></div>';
+  return h;
+}
+
+function vbTextPanelHTML() {
+  var h = '<div class="vb-panel-heading">Text Styles</div>';
+  h += '<p class="vb-panel-hint">Click to add · Double-click on canvas to edit</p>';
+  h += '<div class="vb-text-presets">';
+  vbTextPresets.forEach(function(p, i) {
+    var previewStyle = 'font-family:' + p.fontFamily + ';font-size:' + Math.min(p.fontSize * 0.6, 22) + 'px;color:' + p.color + ';font-weight:' + p.fontWeight + ';font-style:' + p.fontStyle + ';line-height:1.2;';
+    h += '<div class="vb-text-preset" onclick="vbAddText(' + i + ')">' +
+         '<div class="vb-text-preset-sample" style="' + previewStyle + '">' + p.text.split('\n')[0] + '</div>' +
+         '<div class="vb-text-preset-name">' + p.name + '</div>' +
+         '</div>';
+  });
+  h += '</div>';
+  return h;
+}
+
+function vbBuildStickerPanel(ct) {
+  ct.innerHTML = '<div class="vb-panel-heading">Stickers</div>';
+  vbStickerSections.forEach(function(sec) {
+    var sub = document.createElement('div');
+    sub.className = 'vb-panel-subhead';
+    sub.textContent = sec.label;
+    ct.appendChild(sub);
+    var grid = document.createElement('div');
+    grid.className = 'vb-sticker-grid';
+    sec.items.forEach(function(em) {
+      var btn = document.createElement('button');
+      btn.className = 'vb-sticker-pick';
+      btn.textContent = em;
+      btn.addEventListener('click', function() { vbAddSticker(em); });
+      grid.appendChild(btn);
+    });
+    ct.appendChild(grid);
+  });
+}
+
+function vbShapesPanelHTML() {
+  var h = '<div class="vb-panel-heading">Shapes</div>';
+  h += '<div class="vb-shapes-grid">';
+  vbShapeDefs.forEach(function(s, i) {
+    var isLine = s.shape === 'line';
+    var svgStyle = isLine ? 'fill:none;stroke:#a78bfa;stroke-width:6;stroke-linecap:round;' : 'fill:#a78bfa;';
+    h += '<div class="vb-shape-tile" onclick="vbAddShape(' + i + ')" title="' + s.name + '">' +
+         '<svg viewBox="' + s.vb + '" xmlns="http://www.w3.org/2000/svg" style="' + svgStyle + 'width:100%;height:100%;overflow:visible;">' + s.path + '</svg>' +
+         '<span>' + s.name + '</span>' +
+         '</div>';
+  });
+  h += '</div>';
+  return h;
+}
+
+function vbBuildPhotosPanel(ct) {
+  ct.innerHTML = '<div class="vb-panel-heading">Photos</div><p class="vb-panel-hint">Upload your own images</p>';
+  var zone = document.createElement('div');
+  zone.className = 'vb-upload-zone';
+  zone.innerHTML = '<div class="vb-upload-icon">📷</div><div class="vb-upload-text">Click to upload</div><div class="vb-upload-sub">PNG, JPG, GIF, WebP</div>';
+
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*'; inp.style.display = 'none';
+
+  zone.addEventListener('click', function() { inp.click(); });
+  zone.addEventListener('dragover', function(e) { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', function() { zone.classList.remove('drag-over'); });
+  zone.addEventListener('drop', function(e) {
+    e.preventDefault(); zone.classList.remove('drag-over');
+    if (e.dataTransfer.files[0]) vbLoadImageFile(e.dataTransfer.files[0]);
+  });
+  inp.addEventListener('change', function() { if (inp.files[0]) vbLoadImageFile(inp.files[0]); });
+
+  ct.appendChild(zone);
+  ct.appendChild(inp);
+}
+
+// ── Background ───────────────────────────────────────
+
+function vbSetBg(i) {
+  VB.background = vbBgs[i];
+  vbApplyBackground();
+  vbPushHistory();
+  vbSaveState();
+}
+
+function vbSetCustomBg(color) {
+  VB.background = { type: 'solid', value: color };
+  vbApplyBackground();
+  vbSaveState();
+}
+
+function vbApplyBackground() {
+  var c = document.getElementById('vb-canvas');
+  if (!c) return;
+  c.style.background = VB.background.value;
+}
+
+// ── Add items ────────────────────────────────────────
+
+function vbAddText(idx) {
+  var p = vbTextPresets[idx];
+  VB.topZ++;
+  var item = {
+    id: 'vb_' + Date.now(), type: 'text',
+    x: 80 + Math.random() * 200, y: 60 + Math.random() * 120,
+    w: p.w, h: p.h, rotate: 0, opacity: 1, zIndex: VB.topZ,
+    text: p.text,
+    fontFamily: p.fontFamily, fontSize: p.fontSize,
+    color: p.color, fontWeight: p.fontWeight, fontStyle: p.fontStyle,
+    textDecoration: 'none', textAlign: 'left',
+    bg: 'transparent', borderRadius: 0, padding: 10, lineHeight: 1.25,
+  };
+  VB.items.push(item);
+  vbRenderItem(item);
+  vbSelect(item.id);
+  vbPushHistory(); vbSaveState();
+}
+
+function vbAddSticker(emoji) {
+  VB.topZ++;
+  var item = {
+    id: 'vb_' + Date.now(), type: 'sticker',
+    x: 100 + Math.random() * 380, y: 60 + Math.random() * 240,
+    w: 80, h: 80, rotate: Math.random() * 16 - 8, opacity: 1, zIndex: VB.topZ,
+    emoji: emoji, fontSize: 60,
+  };
+  VB.items.push(item);
+  vbRenderItem(item);
+  vbSelect(item.id);
+  vbPushHistory(); vbSaveState();
+}
+
+function vbAddShape(idx) {
+  var s = vbShapeDefs[idx];
+  VB.topZ++;
+  var isLine = s.shape === 'line';
+  var w = isLine ? 200 : (s.shape === 'circle' ? 130 : 160);
+  var h = isLine ? 20  : (s.shape === 'circle' ? 130 : 110);
+  var item = {
+    id: 'vb_' + Date.now(), type: 'shape',
+    x: 100 + Math.random() * 300, y: 60 + Math.random() * 200,
+    w: w, h: h, rotate: 0, opacity: 1, zIndex: VB.topZ,
+    shape: s.shape, vb: s.vb, svgPath: s.path,
+    fill: '#c4b5fd', stroke: 'none', strokeWidth: 0,
+  };
+  VB.items.push(item);
+  vbRenderItem(item);
+  vbSelect(item.id);
+  vbPushHistory(); vbSaveState();
+}
+
+function vbLoadImageFile(file) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    VB.topZ++;
+    var item = {
+      id: 'vb_' + Date.now(), type: 'image',
+      x: 80 + Math.random() * 200, y: 60 + Math.random() * 150,
+      w: 240, h: 180, rotate: 0, opacity: 1, zIndex: VB.topZ,
+      src: e.target.result,
+    };
+    VB.items.push(item);
+    vbRenderItem(item);
+    vbSelect(item.id);
+    vbPushHistory(); vbSaveState();
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── Render ───────────────────────────────────────────
+
+function vbRenderAll() {
+  var canvas = document.getElementById('vb-canvas');
+  if (!canvas) return;
+  canvas.querySelectorAll('.vb-item').forEach(function(el) { el.remove(); });
+  vbApplyBackground();
+  VB.items.forEach(function(item) { vbRenderItem(item); });
+}
+
+function vbRenderItem(item) {
+  var canvas = document.getElementById('vb-canvas');
+  if (!canvas) return;
+  var existing = canvas.querySelector('[data-id="' + item.id + '"]');
+  if (existing) existing.remove();
+
+  var el = document.createElement('div');
+  el.className  = 'vb-item';
+  el.dataset.id = item.id;
+  el.style.position  = 'absolute';
+  el.style.left      = item.x + 'px';
+  el.style.top       = item.y + 'px';
+  el.style.width     = item.w + 'px';
+  el.style.height    = item.h + 'px';
+  el.style.zIndex    = item.zIndex || 10;
+  el.style.transform = 'rotate(' + (item.rotate || 0) + 'deg)';
+  el.style.opacity   = item.opacity !== undefined ? item.opacity : 1;
+  el.style.boxSizing = 'border-box';
+  el.style.cursor    = 'move';
+  el.style.userSelect = 'none';
+
+  if (item.type === 'text') {
+    el.style.fontFamily     = item.fontFamily || "'Poppins',sans-serif";
+    el.style.fontSize       = item.fontSize + 'px';
+    el.style.color          = item.color || '#1a1a2e';
+    el.style.fontWeight     = item.fontWeight || '400';
+    el.style.fontStyle      = item.fontStyle  || 'normal';
+    el.style.textDecoration = item.textDecoration || 'none';
+    el.style.textAlign      = item.textAlign || 'left';
+    el.style.background     = item.bg || 'transparent';
+    el.style.borderRadius   = (item.borderRadius || 0) + 'px';
+    el.style.padding        = (item.padding || 10) + 'px';
+    el.style.lineHeight     = item.lineHeight || 1.25;
+    el.style.whiteSpace     = 'pre-wrap';
+    el.style.wordBreak      = 'break-word';
+    el.style.overflow       = 'hidden';
+    el.textContent = item.text;
+
+    el.addEventListener('dblclick', function(e) {
+      e.stopPropagation();
+      vbEditText(item.id, el);
+    });
+
+  } else if (item.type === 'sticker') {
+    el.style.fontSize       = item.fontSize + 'px';
+    el.style.lineHeight     = '1';
+    el.style.display        = 'flex';
+    el.style.alignItems     = 'center';
+    el.style.justifyContent = 'center';
+    el.textContent = item.emoji;
+
+  } else if (item.type === 'shape') {
+    var isLine = item.shape === 'line';
+    var fillAttr   = isLine ? 'none' : (item.fill || '#c4b5fd');
+    var strokeAttr = isLine ? (item.fill || '#c4b5fd') : (item.stroke && item.stroke !== 'none' ? item.stroke : 'none');
+    var swAttr     = isLine ? '8' : (item.strokeWidth > 0 ? item.strokeWidth : '0');
+    el.innerHTML   = '<svg viewBox="' + item.vb + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;overflow:visible;" fill="' + fillAttr + '" stroke="' + strokeAttr + '" stroke-width="' + swAttr + '">' + item.svgPath + '</svg>';
+
+  } else if (item.type === 'image') {
+    var img = document.createElement('img');
+    img.src = item.src;
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;border-radius:inherit;';
+    el.appendChild(img);
+  }
+
+  el.addEventListener('mousedown', function(e) {
+    if (e.button !== 0) return;
+    e.stopPropagation();
+    vbSelect(item.id);
+    vbStartDrag(e, item.id);
+  });
+
+  var selBox = document.getElementById('vb-sel-box');
+  canvas.insertBefore(el, selBox);
+}
+
+// ── Selection ────────────────────────────────────────
+
+function vbSelect(id) {
+  VB.selectedId = id;
+  var item = VB.items.find(function(i) { return i.id === id; });
+  if (!item) return;
+
+  VB.topZ++;
+  item.zIndex = VB.topZ;
+  var el = document.querySelector('#vb-canvas [data-id="' + id + '"]');
+  if (el) el.style.zIndex = VB.topZ;
+
+  vbUpdateSelBox(item);
+  vbRenderProps(item);
+}
+
+function vbDeselect() {
+  VB.selectedId = null;
+  var box = document.getElementById('vb-sel-box');
+  if (box) box.style.display = 'none';
+  var ph = document.getElementById('vb-props-placeholder');
+  var inn = document.getElementById('vb-props-inner');
+  if (ph)  ph.style.display = 'flex';
+  if (inn) inn.style.display = 'none';
+}
+
+function vbUpdateSelBox(item) {
+  var box = document.getElementById('vb-sel-box');
+  if (!box) return;
+  box.style.display   = 'block';
+  box.style.left      = item.x + 'px';
+  box.style.top       = item.y + 'px';
+  box.style.width     = item.w + 'px';
+  box.style.height    = item.h + 'px';
+  box.style.transform = 'rotate(' + (item.rotate || 0) + 'deg)';
+  box.style.zIndex    = 9998;
+}
+
+function vbClickCanvas(e) {
+  if (e.target === document.getElementById('vb-canvas') ||
+      e.target === document.getElementById('vb-canvas-area') ||
+      e.target === document.getElementById('vb-canvas-outer')) {
+    vbDeselect();
+  }
+}
+
+// ── Drag ─────────────────────────────────────────────
+
+function vbStartDrag(e, id) {
+  e.preventDefault();
+  var item = VB.items.find(function(i) { return i.id === id; });
+  if (!item) return;
+  var sc   = VB.scale;
+  var startMX = e.clientX, startMY = e.clientY;
+  var startX  = item.x,    startY  = item.y;
+
+  function onMove(ev) {
+    item.x = Math.max(-item.w + 20, Math.min(VB.CANVAS_W - 20, startX + (ev.clientX - startMX) / sc));
+    item.y = Math.max(-item.h + 20, Math.min(VB.CANVAS_H - 20, startY + (ev.clientY - startMY) / sc));
+    var el = document.querySelector('#vb-canvas [data-id="' + id + '"]');
+    if (el) { el.style.left = item.x + 'px'; el.style.top = item.y + 'px'; }
+    vbUpdateSelBox(item);
+  }
+  function onUp() {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    vbPushHistory(); vbSaveState();
+  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+// ── Resize ───────────────────────────────────────────
+
+function vbStartResize(e, handle) {
+  e.preventDefault();
+  var id = VB.selectedId;
+  if (!id) return;
+  var item = VB.items.find(function(i) { return i.id === id; });
+  if (!item) return;
+
+  var sc = VB.scale, MIN = 30;
+  var startMX = e.clientX, startMY = e.clientY;
+  var sX = item.x, sY = item.y, sW = item.w, sH = item.h;
+
+  function onMove(ev) {
+    var dx = (ev.clientX - startMX) / sc;
+    var dy = (ev.clientY - startMY) / sc;
+
+    if (handle === 'e'  || handle === 'ne' || handle === 'se') item.w = Math.max(MIN, sW + dx);
+    if (handle === 'w'  || handle === 'nw' || handle === 'sw') { item.w = Math.max(MIN, sW - dx); item.x = sX + sW - item.w; }
+    if (handle === 's'  || handle === 'se' || handle === 'sw') item.h = Math.max(MIN, sH + dy);
+    if (handle === 'n'  || handle === 'ne' || handle === 'nw') { item.h = Math.max(MIN, sH - dy); item.y = sY + sH - item.h; }
+
+    var el = document.querySelector('#vb-canvas [data-id="' + id + '"]');
+    if (el) {
+      el.style.left   = item.x + 'px'; el.style.top  = item.y + 'px';
+      el.style.width  = item.w + 'px'; el.style.height = item.h + 'px';
+    }
+    vbUpdateSelBox(item);
+    // live update props size display
+    var sw = document.getElementById('vb-prop-w');
+    var sh = document.getElementById('vb-prop-h');
+    if (sw) sw.textContent = Math.round(item.w);
+    if (sh) sh.textContent = Math.round(item.h);
+  }
+  function onUp() {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    vbPushHistory(); vbSaveState();
+  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+// ── Rotate ───────────────────────────────────────────
+
+function vbStartRotate(e) {
+  e.preventDefault();
+  var id = VB.selectedId;
+  if (!id) return;
+  var item = VB.items.find(function(i) { return i.id === id; });
+  if (!item) return;
+
+  var canvas   = document.getElementById('vb-canvas');
+  var canvasR  = canvas.getBoundingClientRect();
+  var sc       = VB.scale;
+  var cx = canvasR.left + (item.x + item.w / 2) * sc;
+  var cy = canvasR.top  + (item.y + item.h / 2) * sc;
+
+  function onMove(ev) {
+    var angle = Math.atan2(ev.clientY - cy, ev.clientX - cx) * 180 / Math.PI + 90;
+    // Snap to 15° increments when Shift held
+    if (ev.shiftKey) angle = Math.round(angle / 15) * 15;
+    item.rotate = Math.round(angle);
+    var el = document.querySelector('#vb-canvas [data-id="' + id + '"]');
+    if (el) el.style.transform = 'rotate(' + item.rotate + 'deg)';
+    vbUpdateSelBox(item);
+    var ri = document.getElementById('vb-prop-rotate');
+    if (ri) ri.value = item.rotate;
+  }
+  function onUp() {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    vbPushHistory(); vbSaveState();
+  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+// ── Text editing ─────────────────────────────────────
+
+function vbEditText(id, el) {
+  var item = VB.items.find(function(i) { return i.id === id; });
+  if (!item) return;
+  el.contentEditable = 'true';
+  el.style.cursor = 'text';
+  el.focus();
+  var range = document.createRange();
+  range.selectNodeContents(el);
+  var sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+
+  function onBlur() {
+    el.contentEditable = 'false';
+    el.style.cursor = 'move';
+    item.text = el.textContent;
+    el.removeEventListener('blur', onBlur);
+    el.removeEventListener('keydown', onKey);
+    vbPushHistory(); vbSaveState();
+  }
+  function onKey(e) { if (e.key === 'Escape') { el.blur(); } }
+  el.addEventListener('blur', onBlur);
+  el.addEventListener('keydown', onKey);
+}
+
+// ── Properties panel ─────────────────────────────────
+
+function vbRenderProps(item) {
+  var ph  = document.getElementById('vb-props-placeholder');
+  var inn = document.getElementById('vb-props-inner');
+  if (!ph || !inn) return;
+  ph.style.display  = 'none';
+  inn.style.display = 'block';
+  inn.innerHTML     = '';
+
+  // ── Common: actions row
+  var actions = document.createElement('div');
+  actions.className = 'vb-prop-actions';
+
+  var dupBtn = _vbBtn('⧉  Duplicate', 'vb-prop-action-btn', vbDuplicate);
+  var delBtn = _vbBtn('🗑  Delete', 'vb-prop-action-btn vb-prop-del', vbDeleteSelected);
+  actions.appendChild(dupBtn);
+  actions.appendChild(delBtn);
+  inn.appendChild(actions);
+
+  // ── Size display
+  var sizeDiv = document.createElement('div');
+  sizeDiv.className = 'vb-prop-section';
+  sizeDiv.innerHTML = '<div class="vb-prop-label-row"><span class="vb-prop-sec-label">Size &amp; Position</span></div>' +
+    '<div class="vb-prop-wh"><div class="vb-wh-box"><span class="vb-wh-letter">W</span><span id="vb-prop-w" class="vb-wh-val">' + Math.round(item.w) + '</span></div>' +
+    '<div class="vb-wh-box"><span class="vb-wh-letter">H</span><span id="vb-prop-h" class="vb-wh-val">' + Math.round(item.h) + '</span></div></div>';
+  inn.appendChild(sizeDiv);
+
+  // Rotation
+  inn.appendChild(_vbPropRow('Rotate', _vbNumberInput('vb-prop-rotate', item.rotate || 0, -360, 360, function(val) {
+    item.rotate = val;
+    var el = document.querySelector('#vb-canvas [data-id="' + item.id + '"]');
+    if (el) el.style.transform = 'rotate(' + val + 'deg)';
+    vbUpdateSelBox(item); vbSaveState();
+  }), '°'));
+
+  // Opacity
+  inn.appendChild(_vbSliderRow('Opacity', item.opacity !== undefined ? Math.round(item.opacity * 100) : 100, 0, 100, '%', function(val) {
+    item.opacity = val / 100;
+    var el = document.querySelector('#vb-canvas [data-id="' + item.id + '"]');
+    if (el) el.style.opacity = item.opacity;
+    vbSaveState();
+  }));
+
+  // Layer
+  var layerDiv = document.createElement('div');
+  layerDiv.className = 'vb-prop-layer-row';
+  var fwdBtn = _vbBtn('↑ Forward', 'vb-layer-btn', vbLayerUp);
+  var bckBtn = _vbBtn('↓ Backward', 'vb-layer-btn', vbLayerDown);
+  layerDiv.appendChild(fwdBtn);
+  layerDiv.appendChild(bckBtn);
+  inn.appendChild(layerDiv);
+
+  // ── Type-specific
+  var sep = document.createElement('div');
+  sep.className = 'vb-prop-sep';
+  inn.appendChild(sep);
+
+  if (item.type === 'text')    vbTextPropsUI(inn, item);
+  if (item.type === 'sticker') vbStickerPropsUI(inn, item);
+  if (item.type === 'shape')   vbShapePropsUI(inn, item);
+  if (item.type === 'image')   vbImagePropsUI(inn, item);
+}
+
+function vbTextPropsUI(ct, item) {
+  // Font family
+  var fontSel = document.createElement('select');
+  fontSel.className = 'vb-prop-select';
+  vbFontOptions.forEach(function(f) {
+    var opt = document.createElement('option');
+    opt.value = f.value; opt.textContent = f.label;
+    opt.selected = item.fontFamily === f.value;
+    fontSel.appendChild(opt);
+  });
+  fontSel.addEventListener('change', function() {
+    item.fontFamily = fontSel.value;
+    _vbApplyStyle(item.id, 'fontFamily', item.fontFamily);
+    vbSaveState();
+  });
+  ct.appendChild(_vbPropRow('Font', fontSel));
+
+  // Font size
+  ct.appendChild(_vbSliderRow('Size', item.fontSize, 8, 120, 'px', function(val) {
+    item.fontSize = val;
+    _vbApplyStyle(item.id, 'fontSize', val + 'px');
+    vbSaveState();
+  }));
+
+  // Style buttons
+  var styleRow = document.createElement('div');
+  styleRow.className = 'vb-prop-row';
+  var sl = document.createElement('span');
+  sl.className = 'vb-prop-label'; sl.textContent = 'Style';
+  var styleBtns = document.createElement('div');
+  styleBtns.className = 'vb-style-btns';
+
+  function mkStyleBtn(label, prop, on, off) {
+    var btn = document.createElement('button');
+    btn.className = 'vb-style-btn' + (item[prop] === on ? ' active' : '');
+    btn.innerHTML = '<b>' + label + '</b>';
+    btn.addEventListener('click', function() {
+      item[prop] = item[prop] === on ? off : on;
+      btn.classList.toggle('active', item[prop] === on);
+      var el = document.querySelector('#vb-canvas [data-id="' + item.id + '"]');
+      if (el) {
+        if (prop === 'fontWeight')     el.style.fontWeight     = item[prop];
+        if (prop === 'fontStyle')      el.style.fontStyle      = item[prop];
+        if (prop === 'textDecoration') el.style.textDecoration = item[prop];
+      }
+      vbSaveState();
+    });
+    return btn;
+  }
+
+  styleBtns.appendChild(mkStyleBtn('B', 'fontWeight', '700', '400'));
+  var iBtn = mkStyleBtn('I', 'fontStyle', 'italic', 'normal');
+  iBtn.querySelector('b').style.fontStyle = 'italic';
+  styleBtns.appendChild(iBtn);
+  var uBtn = mkStyleBtn('U', 'textDecoration', 'underline', 'none');
+  uBtn.querySelector('b').style.textDecoration = 'underline';
+  styleBtns.appendChild(uBtn);
+
+  // Align buttons
+  [['L','left'],['C','center'],['R','right']].forEach(function(pair) {
+    var btn = document.createElement('button');
+    btn.className = 'vb-style-btn' + (item.textAlign === pair[1] ? ' active' : '');
+    btn.title = 'Align ' + pair[1];
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 14 14" fill="currentColor"><rect x="0" y="1" width="14" height="2" rx="1"/><rect x="0" y="6" width="' + (pair[1]==='left'?'10':pair[1]==='center'?'14':'10') + '" height="2" rx="1"' + (pair[1]==='right'?' x="4"':'') + '/><rect x="0" y="11" width="14" height="2" rx="1"/></svg>';
+    btn.addEventListener('click', function() {
+      item.textAlign = pair[1];
+      styleBtns.querySelectorAll('.vb-style-btn').slice(3).forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      _vbApplyStyle(item.id, 'textAlign', pair[1]);
+      vbSaveState();
+    });
+    styleBtns.appendChild(btn);
+  });
+
+  styleRow.appendChild(sl);
+  styleRow.appendChild(styleBtns);
+  ct.appendChild(styleRow);
+
+  // Colors
+  ct.appendChild(_vbColorRow('Text Color', item.color || '#1a1a2e', function(val) {
+    item.color = val;
+    _vbApplyStyle(item.id, 'color', val);
+    vbSaveState();
+  }));
+
+  // Card background
+  var bgRow = document.createElement('div');
+  bgRow.className = 'vb-prop-row';
+  var bgl = document.createElement('span'); bgl.className = 'vb-prop-label'; bgl.textContent = 'Card BG';
+  var bgWrap = document.createElement('div'); bgWrap.className = 'vb-bg-color-wrap';
+
+  var noneBtn = document.createElement('button');
+  noneBtn.className = 'vb-none-btn' + (item.bg === 'transparent' ? ' active' : '');
+  noneBtn.textContent = 'None';
+  noneBtn.addEventListener('click', function() {
+    item.bg = 'transparent';
+    _vbApplyStyle(item.id, 'background', 'transparent');
+    noneBtn.classList.add('active');
+    bgPicker.style.opacity = '0.4';
+    vbSaveState();
+  });
+
+  var bgPicker = document.createElement('input');
+  bgPicker.type = 'color';
+  bgPicker.className = 'vb-color-pick';
+  bgPicker.value = (item.bg && item.bg !== 'transparent') ? item.bg : '#ffffff';
+  bgPicker.style.opacity = item.bg === 'transparent' ? '0.4' : '1';
+  bgPicker.addEventListener('input', function() {
+    item.bg = bgPicker.value;
+    _vbApplyStyle(item.id, 'background', item.bg);
+    noneBtn.classList.remove('active');
+    bgPicker.style.opacity = '1';
+    vbSaveState();
+  });
+
+  bgWrap.appendChild(noneBtn); bgWrap.appendChild(bgPicker);
+  bgRow.appendChild(bgl); bgRow.appendChild(bgWrap);
+  ct.appendChild(bgRow);
+
+  // Border radius
+  ct.appendChild(_vbSliderRow('Radius', item.borderRadius || 0, 0, 48, 'px', function(val) {
+    item.borderRadius = val;
+    _vbApplyStyle(item.id, 'borderRadius', val + 'px');
+    vbSaveState();
+  }));
+}
+
+function vbStickerPropsUI(ct, item) {
+  ct.appendChild(_vbSliderRow('Size', item.fontSize, 20, 140, 'px', function(val) {
+    item.fontSize = val;
+    _vbApplyStyle(item.id, 'fontSize', val + 'px');
+    vbSaveState();
+  }));
+}
+
+function vbShapePropsUI(ct, item) {
+  ct.appendChild(_vbColorRow('Fill', item.fill || '#c4b5fd', function(val) {
+    item.fill = val;
+    vbRenderItem(item); vbSaveState();
+  }));
+  ct.appendChild(_vbColorRow('Stroke', (item.stroke && item.stroke !== 'none') ? item.stroke : '#000000', function(val) {
+    item.stroke = val;
+    if (item.strokeWidth === 0) item.strokeWidth = 2;
+    vbRenderItem(item); vbSaveState();
+  }));
+  ct.appendChild(_vbSliderRow('Stroke W', item.strokeWidth || 0, 0, 24, 'px', function(val) {
+    item.strokeWidth = val;
+    item.stroke = val > 0 ? (item.stroke || '#000000') : 'none';
+    vbRenderItem(item); vbSaveState();
+  }));
+}
+
+function vbImagePropsUI(ct, item) {
+  // Crop modes
+  var cropRow = document.createElement('div');
+  cropRow.className = 'vb-prop-row';
+  var cl = document.createElement('span'); cl.className = 'vb-prop-label'; cl.textContent = 'Fit';
+  var cropBtns = document.createElement('div'); cropBtns.className = 'vb-style-btns';
+  ['cover','contain','fill'].forEach(function(mode) {
+    var btn = document.createElement('button');
+    btn.className = 'vb-style-btn';
+    btn.textContent = mode;
+    btn.addEventListener('click', function() {
+      item.objectFit = mode;
+      var img = document.querySelector('#vb-canvas [data-id="' + item.id + '"] img');
+      if (img) img.style.objectFit = mode;
+      cropBtns.querySelectorAll('.vb-style-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      vbSaveState();
+    });
+    cropBtns.appendChild(btn);
+  });
+  cropRow.appendChild(cl); cropRow.appendChild(cropBtns);
+  ct.appendChild(cropRow);
+}
+
+// ── Prop helpers ──────────────────────────────────────
+
+function _vbBtn(text, cls, fn) {
+  var btn = document.createElement('button');
+  btn.className = cls; btn.innerHTML = text;
+  btn.addEventListener('click', fn);
+  return btn;
+}
+
+function _vbPropRow(label, control, suffix) {
+  var row = document.createElement('div');
+  row.className = 'vb-prop-row';
+  var lbl = document.createElement('span');
+  lbl.className = 'vb-prop-label'; lbl.textContent = label;
+  row.appendChild(lbl);
+  row.appendChild(control);
+  if (suffix) {
+    var s = document.createElement('span');
+    s.className = 'vb-prop-unit'; s.textContent = suffix;
+    row.appendChild(s);
+  }
+  return row;
+}
+
+function _vbNumberInput(id, value, min, max, onChange) {
+  var inp = document.createElement('input');
+  inp.type = 'number'; inp.id = id; inp.value = value;
+  inp.min = min; inp.max = max; inp.step = 1;
+  inp.className = 'vb-prop-number';
+  inp.addEventListener('input', function() { onChange(parseFloat(inp.value) || 0); });
+  return inp;
+}
+
+function _vbSliderRow(label, value, min, max, unit, onChange) {
+  var row = document.createElement('div');
+  row.className = 'vb-prop-row vb-slider-row';
+  var lbl = document.createElement('span');
+  lbl.className = 'vb-prop-label'; lbl.textContent = label;
+
+  var sl = document.createElement('input');
+  sl.type = 'range'; sl.min = min; sl.max = max; sl.value = value;
+  sl.className = 'vb-prop-slider';
+
+  var valEl = document.createElement('span');
+  valEl.className = 'vb-prop-val'; valEl.textContent = value + unit;
+
+  sl.addEventListener('input', function() {
+    valEl.textContent = sl.value + unit;
+    onChange(parseFloat(sl.value));
+  });
+
+  row.appendChild(lbl); row.appendChild(sl); row.appendChild(valEl);
+  return row;
+}
+
+function _vbColorRow(label, value, onChange) {
+  var row = document.createElement('div');
+  row.className = 'vb-prop-row';
+  var lbl = document.createElement('span');
+  lbl.className = 'vb-prop-label'; lbl.textContent = label;
+
+  var wrap = document.createElement('div'); wrap.className = 'vb-color-wrap';
+  var swatch = document.createElement('div');
+  swatch.className = 'vb-color-swatch';
+  swatch.style.background = value;
+
+  var inp = document.createElement('input');
+  inp.type = 'color'; inp.value = value; inp.className = 'vb-color-pick-hidden';
+  inp.addEventListener('input', function() {
+    swatch.style.background = inp.value;
+    onChange(inp.value);
+  });
+  swatch.addEventListener('click', function() { inp.click(); });
+
+  wrap.appendChild(swatch); wrap.appendChild(inp);
+  row.appendChild(lbl); row.appendChild(wrap);
+  return row;
+}
+
+function _vbApplyStyle(id, prop, value) {
+  var el = document.querySelector('#vb-canvas [data-id="' + id + '"]');
+  if (el) el.style[prop] = value;
+}
+
+// ── Item actions ──────────────────────────────────────
+
+function vbDeleteSelected() {
+  if (!VB.selectedId) return;
+  VB.items = VB.items.filter(function(i) { return i.id !== VB.selectedId; });
+  var el = document.querySelector('#vb-canvas [data-id="' + VB.selectedId + '"]');
+  if (el) el.remove();
+  vbDeselect();
+  vbPushHistory(); vbSaveState();
+}
+
+function vbDuplicate() {
+  if (!VB.selectedId) return;
+  var item = VB.items.find(function(i) { return i.id === VB.selectedId; });
+  if (!item) return;
+  VB.topZ++;
+  var copy = JSON.parse(JSON.stringify(item));
+  copy.id = 'vb_' + Date.now();
+  copy.x  = Math.min(item.x + 24, VB.CANVAS_W - item.w);
+  copy.y  = Math.min(item.y + 24, VB.CANVAS_H - item.h);
+  copy.zIndex = VB.topZ;
+  VB.items.push(copy);
+  vbRenderItem(copy);
+  vbSelect(copy.id);
+  vbPushHistory(); vbSaveState();
+}
+
+function vbLayerUp() {
+  if (!VB.selectedId) return;
+  var item = VB.items.find(function(i) { return i.id === VB.selectedId; });
+  if (!item) return;
+  VB.topZ++;
+  item.zIndex = VB.topZ;
+  var el = document.querySelector('#vb-canvas [data-id="' + VB.selectedId + '"]');
+  if (el) el.style.zIndex = VB.topZ;
+  vbSaveState();
+}
+
+function vbLayerDown() {
+  if (!VB.selectedId) return;
+  var item = VB.items.find(function(i) { return i.id === VB.selectedId; });
+  if (!item) return;
+  item.zIndex = Math.max(1, (item.zIndex || 10) - 2);
+  var el = document.querySelector('#vb-canvas [data-id="' + VB.selectedId + '"]');
+  if (el) el.style.zIndex = item.zIndex;
+  vbSaveState();
+}
+
+// ── Undo / Redo ──────────────────────────────────────
+
+function vbPushHistory() {
+  VB.history = VB.history.slice(0, VB.histIdx + 1);
+  VB.history.push(JSON.stringify({ items: VB.items, background: VB.background, topZ: VB.topZ }));
+  VB.histIdx = VB.history.length - 1;
+  if (VB.history.length > 60) { VB.history.shift(); VB.histIdx--; }
+  vbUpdateHistoryBtns();
+}
+
+function vbUndo() {
+  if (VB.histIdx <= 0) return;
+  VB.histIdx--;
+  vbRestoreState(VB.history[VB.histIdx]);
+}
+
+function vbRedo() {
+  if (VB.histIdx >= VB.history.length - 1) return;
+  VB.histIdx++;
+  vbRestoreState(VB.history[VB.histIdx]);
+}
+
+function vbRestoreState(json) {
+  try {
+    var st = JSON.parse(json);
+    VB.items = st.items; VB.background = st.background; VB.topZ = st.topZ || 10;
+    vbDeselect(); vbRenderAll(); vbUpdateHistoryBtns(); vbSaveState();
+  } catch(e) {}
+}
+
+function vbUpdateHistoryBtns() {
+  var u = document.getElementById('vb-undo-btn');
+  var r = document.getElementById('vb-redo-btn');
+  if (u) u.disabled = VB.histIdx <= 0;
+  if (r) r.disabled = VB.histIdx >= VB.history.length - 1;
+}
+
+// ── Save / Load ───────────────────────────────────────
+
+function vbSaveState() {
+  try {
+    localStorage.setItem('eq_visionboard', JSON.stringify({
+      items: VB.items, background: VB.background, topZ: VB.topZ
+    }));
+  } catch(e) {}
+}
+
+function vbLoadState() {
+  try {
+    var saved = localStorage.getItem('eq_visionboard');
+    if (!saved) return;
+    var data = JSON.parse(saved);
+    VB.items      = data.items      || [];
+    VB.background = data.background || { type:'solid', value:'#ffffff' };
+    VB.topZ       = data.topZ       || 10;
+    VB.history    = [JSON.stringify({ items: VB.items, background: VB.background, topZ: VB.topZ })];
+    VB.histIdx    = 0;
+  } catch(e) { VB.items = []; }
+}
+
+// ── Download ─────────────────────────────────────────
+
+function vbDownload() {
+  vbDeselect();
+  var canvas = document.getElementById('vb-canvas');
+  if (!canvas) return;
+
+  if (window.html2canvas) {
+    html2canvas(canvas, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: null })
+      .then(function(c) {
+        var link = document.createElement('a');
+        link.download = 'my-vision-board.png';
+        link.href = c.toDataURL('image/png');
+        link.click();
+      });
+  } else {
+    alert('To save your board, right-click it and choose "Save image as", or press Print Screen.');
+  }
+}
+
+// ── Clear & Close ─────────────────────────────────────
+
+function vbClearBoard() {
+  if (!confirm('Clear the entire vision board? This cannot be undone.')) return;
+  VB.items = []; VB.topZ = 10;
+  vbRenderAll(); vbDeselect();
+  vbPushHistory(); vbSaveState();
+}
+
+function closeVisionBoard() {
+  vbDeselect();
+  showPage('dashboard');
+}
