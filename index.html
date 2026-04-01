@@ -771,6 +771,52 @@
 <!-- Pomodoro toast -->
 <div class="pom-toast" id="pom-toast"></div>
 
+<!-- Dark mode toggle -->
+<button id="dark-toggle" class="dark-toggle-btn" onclick="toggleDarkMode()" title="Toggle dark mode">🌙</button>
+
+<!-- ══ RECHARGE / GAMES PAGE ════════════════════════════════════════════════ -->
+<section id="recharge" class="page recharge-page">
+  <header class="recharge-topbar">
+    <button class="recharge-back-btn" onclick="showPage('dashboard')">← Dashboard</button>
+    <div class="recharge-topbar-title"><span>🎮</span> Recharge</div>
+    <div></div>
+  </header>
+
+  <!-- Game picker -->
+  <div id="recharge-picker" class="recharge-picker">
+    <button class="recharge-back-btn" onclick="showPage('dashboard')" style="margin-bottom:16px;">← Dashboard</button>
+    <p class="recharge-subtitle">Pick a game — take a mindful break, then get back to it 💪</p>
+    <div class="recharge-grid">
+      <div class="rg-card" onclick="launchGame('bubble')">
+        <div class="rg-icon">🫧</div>
+        <h3 class="rg-name">Bubble Pop</h3>
+        <p class="rg-desc">Tap bubbles as they float up. Pure, calming satisfaction.</p>
+        <button class="rg-play-btn">Play</button>
+      </div>
+      <div class="rg-card" onclick="launchGame('memory')">
+        <div class="rg-icon">🃏</div>
+        <h3 class="rg-name">Memory Match</h3>
+        <p class="rg-desc">Flip cards to find matching pairs. Train your short-term memory.</p>
+        <button class="rg-play-btn">Play</button>
+      </div>
+      <div class="rg-card" onclick="launchGame('2048')">
+        <div class="rg-icon">🔢</div>
+        <h3 class="rg-name">2048</h3>
+        <p class="rg-desc">Slide tiles to combine numbers. Calm focus and flow state.</p>
+        <button class="rg-play-btn">Play</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active game arena -->
+  <div id="recharge-arena" style="display:none;">
+    <button class="recharge-exit-btn" onclick="exitGame()">← All Games</button>
+    <div id="game-bubble"></div>
+    <div id="game-memory"></div>
+    <div id="game-2048"></div>
+  </div>
+</section>
+
 <!-- ══ VISION BOARD PAGE ═════════════════════════════════════════════════════ -->
 <section id="vision-board" class="page vb-page">
 

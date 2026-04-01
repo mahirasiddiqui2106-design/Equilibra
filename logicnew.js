@@ -96,6 +96,13 @@ const equilibraFeatures = [
     title: "Vision Board",
     short: "Visualise your dreams",
     detail: "Build a beautiful collage of your goals, affirmations, and dreams."
+  },
+  {
+    id: "recharge",
+    icon: "🎮",
+    title: "Recharge",
+    short: "Calm games to recharge",
+    detail: "Quick stress-relieving mini games to reset your mind between study sessions."
   }
 ];
 
@@ -319,6 +326,25 @@ function typeWelcomeText() {
 }
 
 
+// ── DARK MODE ────────────────────────────────────────────────────────────────
+(function() {
+    if (localStorage.getItem('eq_dark_mode') === '1') {
+        document.body.classList.add('dark');
+        document.addEventListener('DOMContentLoaded', function() {
+            var btn = document.getElementById('dark-toggle');
+            if (btn) btn.textContent = '☀️';
+        });
+    }
+})();
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark');
+    var isDark = document.body.classList.contains('dark');
+    localStorage.setItem('eq_dark_mode', isDark ? '1' : '0');
+    var btn = document.getElementById('dark-toggle');
+    if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+}
+
 function updateDashGreeting() {
     const hour = new Date().getHours();
     const timeLabel = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
@@ -371,6 +397,7 @@ function renderEquilibraCards() {
             else if (feature.id === "unload")      { showPage("unload"); }
             else if (feature.id === "pomodoro")    { showPage("pomodoro"); }
             else if (feature.id === "visionboard") { showPage("vision-board"); }
+            else if (feature.id === "recharge")    { showPage("recharge"); }
             else                                   { toggleEquilibraCard(card); }
         });
         container.appendChild(card);
@@ -1294,6 +1321,7 @@ function renderEquilibraCardsIn(selector) {
             else if (feature.id === "unload")      { showPage("unload"); }
             else if (feature.id === "pomodoro")    { showPage("pomodoro"); }
             else if (feature.id === "visionboard") { showPage("vision-board"); }
+            else if (feature.id === "recharge")    { showPage("recharge"); }
             else                                   { toggleEquilibraCard(card); }
         });
         container.appendChild(card);
@@ -1442,6 +1470,275 @@ function saveNewEvent() {
 
     document.getElementById('new-event-overlay').style.display = 'none';
     renderCalendar();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// RECHARGE — GAMES
+// ══════════════════════════════════════════════════════════════════════════════
+
+let _bubbleRunning = false;
+let _2048KeyHandler = null;
+
+function launchGame(gameId) {
+    document.getElementById('recharge-picker').style.display = 'none';
+    const arena = document.getElementById('recharge-arena');
+    arena.style.display = 'block';
+    ['game-bubble','game-memory','game-2048'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+    _bubbleRunning = false;
+    if (_2048KeyHandler) { document.removeEventListener('keydown', _2048KeyHandler); _2048KeyHandler = null; }
+
+    if (gameId === 'bubble')  { document.getElementById('game-bubble').style.display = 'block'; initBubblePop(); }
+    if (gameId === 'memory')  { document.getElementById('game-memory').style.display = 'block'; initMemoryMatch(); }
+    if (gameId === '2048')    { document.getElementById('game-2048').style.display  = 'block'; init2048(); }
+}
+
+function exitGame() {
+    _bubbleRunning = false;
+    if (_2048KeyHandler) { document.removeEventListener('keydown', _2048KeyHandler); _2048KeyHandler = null; }
+    document.getElementById('recharge-arena').style.display = 'none';
+    document.getElementById('recharge-picker').style.display = 'block';
+}
+
+// ── BUBBLE POP ────────────────────────────────────────────────────────────────
+function initBubblePop() {
+    const container = document.getElementById('game-bubble');
+    container.innerHTML = `
+        <div class="bp-header">
+            <span class="bp-score-label">Score: <strong id="bp-score">0</strong></span>
+            <button class="bp-reset-btn" onclick="initBubblePop()">Reset</button>
+        </div>
+        <canvas id="bp-canvas" class="bp-canvas"></canvas>
+        <p class="bp-hint">Click the bubbles to pop them!</p>
+    `;
+    const canvas = document.getElementById('bp-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width  = Math.min(560, container.clientWidth - 32);
+    canvas.height = 420;
+
+    let score = 0;
+    const bubbles = [], particles = [];
+    const COLORS = ['#a78bfa','#60a5fa','#34d399','#f472b6','#fbbf24','#6ee7b7','#fb7185'];
+
+    function mkBubble(yOverride) {
+        const r = 18 + Math.random() * 26;
+        return {
+            x: r + Math.random() * (canvas.width - 2 * r),
+            y: yOverride !== undefined ? yOverride : canvas.height + r,
+            r, speed: 0.6 + Math.random() * 1.1,
+            color: COLORS[Math.floor(Math.random() * COLORS.length)],
+            wobble: Math.random() * Math.PI * 2,
+            ws: 0.018 + Math.random() * 0.022
+        };
+    }
+
+    for (let i = 0; i < 7; i++) { const b = mkBubble(Math.random() * canvas.height); bubbles.push(b); }
+
+    canvas.addEventListener('click', e => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+        const my = (e.clientY - rect.top)  * (canvas.height / rect.height);
+        for (let i = bubbles.length - 1; i >= 0; i--) {
+            const b = bubbles[i];
+            if (Math.hypot(mx - b.x, my - b.y) <= b.r) {
+                score++;
+                document.getElementById('bp-score').textContent = score;
+                for (let p = 0; p < 10; p++) {
+                    const a = (Math.PI * 2 * p) / 10;
+                    particles.push({ x: b.x, y: b.y, vx: Math.cos(a) * (2 + Math.random() * 3), vy: Math.sin(a) * (2 + Math.random() * 3), color: b.color, life: 1 });
+                }
+                bubbles.splice(i, 1);
+                break;
+            }
+        }
+    });
+
+    _bubbleRunning = true;
+    let frame = 0;
+    (function loop() {
+        if (!_bubbleRunning) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        frame++;
+        if (frame % 75 === 0 && bubbles.length < 14) bubbles.push(mkBubble());
+
+        bubbles.forEach((b, i) => {
+            b.y -= b.speed; b.wobble += b.ws; b.x += Math.sin(b.wobble) * 0.6;
+            if (b.y + b.r < 0) { bubbles[i] = mkBubble(); return; }
+            ctx.save();
+            ctx.globalAlpha = 0.82;
+            ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+            ctx.fillStyle = b.color + '33'; ctx.fill();
+            ctx.strokeStyle = b.color; ctx.lineWidth = 2.5; ctx.stroke();
+            ctx.globalAlpha = 0.35;
+            ctx.beginPath(); ctx.arc(b.x - b.r * 0.28, b.y - b.r * 0.3, b.r * 0.22, 0, Math.PI * 2);
+            ctx.fillStyle = 'white'; ctx.fill();
+            ctx.restore();
+        });
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.life -= 0.045;
+            if (p.life <= 0) { particles.splice(i, 1); continue; }
+            ctx.save(); ctx.globalAlpha = p.life;
+            ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = p.color; ctx.fill(); ctx.restore();
+        }
+        requestAnimationFrame(loop);
+    })();
+}
+
+// ── MEMORY MATCH ─────────────────────────────────────────────────────────────
+function initMemoryMatch() {
+    const container = document.getElementById('game-memory');
+    const EMOJIS = ['🌸','🦋','🌙','⭐','🌈','🎯','🦊','🐬','🍀','🎨'];
+    const picked = EMOJIS.slice(0, 8);
+    const cards = [...picked, ...picked].sort(() => Math.random() - 0.5);
+    let flipped = [], matched = new Set(), moves = 0, locked = false;
+    let startTime = null, timerInterval = null;
+
+    function buildGrid() {
+        container.innerHTML = `
+            <div class="mm-header">
+                <span>Moves: <strong id="mm-moves">0</strong></span>
+                <span id="mm-timer">0s</span>
+                <button class="mm-new-btn" onclick="initMemoryMatch()">New Game</button>
+            </div>
+            <div class="mm-grid" id="mm-grid"></div>
+            <div id="mm-win" class="mm-win" style="display:none;">🎉 Solved in <span id="mm-win-moves"></span> moves & <span id="mm-win-time"></span>!</div>
+        `;
+        const grid = document.getElementById('mm-grid');
+        cards.forEach((emoji, idx) => {
+            const card = document.createElement('div');
+            card.className = 'mm-card' + (matched.has(idx) ? ' mm-matched' : '') + (flipped.includes(idx) ? ' mm-flipped' : '');
+            card.innerHTML = `<div class="mm-inner"><div class="mm-front"></div><div class="mm-back">${emoji}</div></div>`;
+            card.addEventListener('click', () => {
+                if (locked || flipped.includes(idx) || matched.has(idx)) return;
+                if (!startTime) {
+                    startTime = Date.now();
+                    timerInterval = setInterval(() => {
+                        const el = document.getElementById('mm-timer');
+                        if (el) el.textContent = Math.floor((Date.now() - startTime) / 1000) + 's';
+                    }, 500);
+                }
+                flipped.push(idx);
+                card.classList.add('mm-flipped');
+                if (flipped.length === 2) {
+                    locked = true; moves++;
+                    document.getElementById('mm-moves').textContent = moves;
+                    const [a, b] = flipped;
+                    if (cards[a] === cards[b]) {
+                        matched.add(a); matched.add(b); flipped = []; locked = false;
+                        document.querySelectorAll('#mm-grid .mm-card')[a].classList.add('mm-matched');
+                        document.querySelectorAll('#mm-grid .mm-card')[b].classList.add('mm-matched');
+                        if (matched.size === cards.length) {
+                            clearInterval(timerInterval);
+                            const secs = Math.floor((Date.now() - startTime) / 1000);
+                            document.getElementById('mm-win').style.display = 'block';
+                            document.getElementById('mm-win-moves').textContent = moves;
+                            document.getElementById('mm-win-time').textContent = secs + 's';
+                        }
+                    } else {
+                        setTimeout(() => {
+                            const allCards = document.querySelectorAll('#mm-grid .mm-card');
+                            flipped.forEach(i => { if (!matched.has(i)) allCards[i].classList.remove('mm-flipped'); });
+                            flipped = []; locked = false;
+                        }, 900);
+                    }
+                }
+            });
+            grid.appendChild(card);
+        });
+    }
+    buildGrid();
+}
+
+// ── 2048 ──────────────────────────────────────────────────────────────────────
+function init2048() {
+    const container = document.getElementById('game-2048');
+    let board = Array.from({length:4}, () => Array(4).fill(0));
+    let score = 0, best = parseInt(localStorage.getItem('eq_2048_best')||'0'), gameOver = false;
+
+    function addRandom() {
+        const empty = [];
+        for (let r=0;r<4;r++) for (let c=0;c<4;c++) if (!board[r][c]) empty.push([r,c]);
+        if (!empty.length) return;
+        const [r,c] = empty[Math.floor(Math.random()*empty.length)];
+        board[r][c] = Math.random() < 0.9 ? 2 : 4;
+    }
+
+    function slideRow(row) {
+        let a = row.filter(v=>v), gain = 0;
+        for (let i=0;i<a.length-1;i++) { if (a[i]===a[i+1]) { a[i]*=2; gain+=a[i]; a.splice(i+1,1); } }
+        while (a.length<4) a.push(0);
+        return {row:a, gain};
+    }
+
+    function transpose(b)  { return b[0].map((_,i)=>b.map(r=>r[i])); }
+    function reverseRows(b){ return b.map(r=>[...r].reverse()); }
+
+    function move(dir) {
+        if (gameOver) return;
+        let b = board.map(r=>[...r]), gain = 0, moved = false;
+        if (dir==='left')  { b = b.map(r=>{ const s=slideRow(r); gain+=s.gain; return s.row; }); }
+        if (dir==='right') { b = reverseRows(b).map(r=>{ const s=slideRow(r); gain+=s.gain; return s.row; }); b=reverseRows(b); }
+        if (dir==='up')    { b = transpose(b).map(r=>{ const s=slideRow(r); gain+=s.gain; return s.row; }); b=transpose(b); }
+        if (dir==='down')  { b = reverseRows(transpose(b)).map(r=>{ const s=slideRow(r); gain+=s.gain; return s.row; }); b=transpose(reverseRows(b)); }
+        if (JSON.stringify(b) !== JSON.stringify(board)) { moved=true; board=b; }
+        if (moved) {
+            score += gain;
+            if (score > best) { best = score; localStorage.setItem('eq_2048_best', best); }
+            addRandom();
+            const flat = board.flat();
+            if (!flat.includes(0)) {
+                let stuck = true;
+                for (let r=0;r<4&&stuck;r++) for (let c=0;c<4&&stuck;c++) {
+                    if ((r<3&&board[r][c]===board[r+1][c])||(c<3&&board[r][c]===board[r][c+1])) stuck=false;
+                }
+                if (stuck) gameOver = true;
+            }
+            render();
+        }
+    }
+
+    const TILE_BG = { 0:'#e0dce8',2:'#eee4da',4:'#ede0c8',8:'#f2b179',16:'#f59563',32:'#f67c5f',64:'#f65e3b',128:'#edcf72',256:'#edcc61',512:'#edc850',1024:'#edc53f',2048:'#edc22e' };
+
+    function render() {
+        container.innerHTML = `
+            <div class="g48-header">
+                <div class="g48-title-block"><span class="g48-title">2048</span><span class="g48-hint">Arrow keys or swipe</span></div>
+                <div class="g48-scores">
+                    <div class="g48-score-box"><div class="g48-score-lbl">SCORE</div><div id="g48-score">${score}</div></div>
+                    <div class="g48-score-box"><div class="g48-score-lbl">BEST</div><div>${best}</div></div>
+                </div>
+                <button class="g48-new-btn" onclick="init2048()">New</button>
+            </div>
+            <div class="g48-board" id="g48-board">
+                ${board.map(row=>row.map(v=>`<div class="g48-cell" style="background:${TILE_BG[v]||'#3c3a32'};color:${v>4?'#f9f6f2':'#776e65'};font-size:${v>=1024?'1.1rem':v>=128?'1.4rem':'1.7rem'}">${v||''}</div>`).join('')).join('')}
+            </div>
+            ${gameOver?'<div class="g48-over">Game Over! Hit New to try again.</div>':''}
+        `;
+
+        if (_2048KeyHandler) document.removeEventListener('keydown', _2048KeyHandler);
+        _2048KeyHandler = e => {
+            const map = {ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down'};
+            if (map[e.key]) { e.preventDefault(); move(map[e.key]); }
+        };
+        document.addEventListener('keydown', _2048KeyHandler);
+
+        const boardEl = document.getElementById('g48-board');
+        if (boardEl) {
+            let tx, ty;
+            boardEl.addEventListener('touchstart', e=>{ tx=e.touches[0].clientX; ty=e.touches[0].clientY; }, {passive:true});
+            boardEl.addEventListener('touchend', e=>{
+                const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+                if (Math.abs(dx)>Math.abs(dy)) move(dx>0?'right':'left'); else move(dy>0?'down':'up');
+            }, {passive:true});
+        }
+    }
+
+    addRandom(); addRandom(); render();
 }
 
 function changeMonth(dir) {
