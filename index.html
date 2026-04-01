@@ -273,7 +273,11 @@
             <!-- MY COURSES VIEW -->
             <div id="mycourses-view" style="display:none;">
                 <h2 class="dash-heading">My Courses</h2>
-                <p class="dash-sub">All your enrolled courses</p>
+                <div class="course-filter-row">
+                    <button class="cf-btn active" data-filter="all"       onclick="setCourseFilter('all',this)">All</button>
+                    <button class="cf-btn"        data-filter="active"    onclick="setCourseFilter('active',this)">Active</button>
+                    <button class="cf-btn"        data-filter="completed" onclick="setCourseFilter('completed',this)">Completed</button>
+                </div>
                 <div class="course-grid" id="course-grid-mycourses"></div>
             </div>
 

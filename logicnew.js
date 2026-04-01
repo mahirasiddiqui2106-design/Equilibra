@@ -951,10 +951,34 @@ function renderCourseGrid() {
     renderUpcomingDeadlines();
 }
 
+// Track last-accessed timestamps per course
+function recordCourseAccess(courseId) {
+    try {
+        var map = JSON.parse(localStorage.getItem(uKey('eq_course_access')) || '{}');
+        map[courseId] = Date.now();
+        localStorage.setItem(uKey('eq_course_access'), JSON.stringify(map));
+    } catch(e) {}
+}
+function getCourseAccessMap() {
+    try { return JSON.parse(localStorage.getItem(uKey('eq_course_access')) || '{}'); }
+    catch(e) { return {}; }
+}
+
+// My Courses filter state
+var currentCourseFilter = 'all';
+
+function setCourseFilter(filter, btn) {
+    currentCourseFilter = filter;
+    document.querySelectorAll('.cf-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderCourseGridIn('course-grid-mycourses', true);
+}
+
 // Open a course detail page
 function openCourse(courseId) {
     const course = courses.find(c => c.id === courseId);
     if (!course) return;
+    recordCourseAccess(courseId);
 
     document.getElementById("detail-title").textContent = `${course.title} (${course.code})`;
     document.getElementById("detail-semester").textContent = course.semester;
@@ -1261,7 +1285,7 @@ function switchTab(viewId) {
     const navEl = document.getElementById(navMap[viewId]);
     if (navEl) navEl.classList.add('active');
 
-    if (viewId === 'mycourses-view') renderCourseGridIn('course-grid-mycourses');
+    if (viewId === 'mycourses-view') renderCourseGridIn('course-grid-mycourses', true);
     if (viewId === 'calendar-view')  renderCalendar();
 }
 
@@ -1347,21 +1371,47 @@ function changeMonth(dir) {
     renderCalendar();
 }
 
-function renderCourseGridIn(gridId) {
+function renderCourseGridIn(gridId, force) {
     const grid = document.getElementById(gridId);
-    if (!grid || grid.children.length > 0) return;
-    courses.forEach(course => {
+    if (!grid) return;
+    if (!force && grid.children.length > 0) return;
+    grid.innerHTML = '';
+
+    const accessMap = getCourseAccessMap();
+    var filtered = courses;
+
+    if (currentCourseFilter === 'active') {
+        // Recently accessed — sort by last accessed time, show those opened at least once
+        const accessed = courses.filter(c => accessMap[c.id]);
+        if (accessed.length === 0) {
+            grid.innerHTML = '<p style="color:#888;padding:20px 0;grid-column:1/-1;">No recently accessed courses yet. Click any course to open it.</p>';
+            return;
+        }
+        filtered = accessed.slice().sort((a, b) => (accessMap[b.id] || 0) - (accessMap[a.id] || 0));
+    } else if (currentCourseFilter === 'completed') {
+        filtered = courses.filter(c => calcCompletion(c) === 100);
+        if (filtered.length === 0) {
+            grid.innerHTML = '<p style="color:#888;padding:20px 0;grid-column:1/-1;">No completed courses yet. Keep going!</p>';
+            return;
+        }
+    }
+
+    filtered.forEach(course => {
+        const pct = calcCompletion(course);
         const card = document.createElement('div');
         card.className = 'course-card';
+        const lastAccessed = accessMap[course.id];
+        const recentTag = lastAccessed ? `<span class="cf-recent-tag">Recently opened</span>` : '';
         card.innerHTML = `
             <div class="course-cover ${course.cover}"></div>
             <div class="course-info">
                 <h4>${course.title}</h4>
-                <span>${course.semester}</span>
+                <span>${course.code} &nbsp;${course.semester}</span>
                 <div class="completion-bar-wrap">
-                    <div class="completion-bar" style="width:${course.completion}%"></div>
+                    <div class="completion-bar" style="width:${pct}%"></div>
                 </div>
-                <span class="completion-pct">${course.completion}% complete</span>
+                <span class="completion-pct">${pct}% complete</span>
+                ${currentCourseFilter === 'active' ? recentTag : ''}
             </div>
         `;
         card.addEventListener('click', () => openCourse(course.id));
