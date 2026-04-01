@@ -319,6 +319,30 @@ function typeWelcomeText() {
 }
 
 
+function updateDashGreeting() {
+    const hour = new Date().getHours();
+    const timeLabel = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    const timeEl = document.getElementById('dash-time-label');
+    if (timeEl) timeEl.textContent = timeLabel;
+
+    const dateEl = document.getElementById('dash-date-label');
+    if (dateEl) {
+        const now = new Date();
+        dateEl.textContent = now.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    const nameEl = document.querySelector('.dash-greeting-name');
+    if (nameEl) {
+        try {
+            var u = JSON.parse(localStorage.getItem('eq_current_user') || 'null');
+            nameEl.textContent = u && u.name ? 'Welcome back, ' + u.name.split(' ')[0] + ' 👋' : 'Welcome back 👋';
+        } catch(e) {}
+    }
+
+    const statCoursesEl = document.getElementById('dash-stat-courses');
+    if (statCoursesEl) statCoursesEl.textContent = courses.length;
+}
+
 function renderEquilibraCards() {
     const container = document.getElementById("equilibra-cards-dash");
     if (!container) return;
@@ -967,6 +991,12 @@ function getCourseAccessMap() {
 // My Courses filter state
 var currentCourseFilter = 'all';
 
+function goToActiveCourses() {
+    switchTab('mycourses-view');
+    var activeBtn = document.querySelector('.cf-btn[data-filter="active"]');
+    setCourseFilter('active', activeBtn);
+}
+
 function setCourseFilter(filter, btn) {
     currentCourseFilter = filter;
     document.querySelectorAll('.cf-btn').forEach(b => b.classList.remove('active'));
@@ -1352,9 +1382,12 @@ function renderCalendar() {
         cell.appendChild(dateEl);
 
         const key = calYear + '-' + (calMonth + 1) + '-' + d;
-        (calEvents[key] || []).forEach(ev => {
+        const userEvs = getUserEvents()[key] || [];
+        const allEventsForDay = (calEvents[key] || []).concat(userEvs);
+        allEventsForDay.forEach((ev, idx) => {
             const evEl = document.createElement('div');
-            evEl.className = 'cal-event';
+            const isUser = idx >= (calEvents[key] || []).length;
+            evEl.className = 'cal-event' + (isUser ? ' cal-event--user' : '');
             evEl.textContent = ev.length > 13 ? ev.substring(0, 13) + '...' : ev;
             evEl.title = ev;
             cell.appendChild(evEl);
@@ -1362,6 +1395,53 @@ function renderCalendar() {
 
         grid.appendChild(cell);
     }
+}
+
+// ── User events (persisted per user) ─────────────────────────────────────────
+function getUserEvents() {
+    try { return JSON.parse(localStorage.getItem(uKey('eq_cal_events')) || '{}'); }
+    catch(e) { return {}; }
+}
+function putUserEvents(map) {
+    localStorage.setItem(uKey('eq_cal_events'), JSON.stringify(map));
+}
+
+function openNewEventModal() {
+    const overlay = document.getElementById('new-event-overlay');
+    if (!overlay) return;
+    document.getElementById('nev-name').value = '';
+    // Default date = today
+    const today = new Date();
+    document.getElementById('nev-date').value = today.toISOString().slice(0, 10);
+    document.getElementById('nev-err').style.display = 'none';
+    overlay.style.display = 'flex';
+    setTimeout(() => document.getElementById('nev-name').focus(), 50);
+}
+
+function closeNewEventModal(e) {
+    if (e && e.target !== document.getElementById('new-event-overlay')) return;
+    document.getElementById('new-event-overlay').style.display = 'none';
+}
+
+function saveNewEvent() {
+    const name = document.getElementById('nev-name').value.trim();
+    const dateVal = document.getElementById('nev-date').value;
+    const errEl = document.getElementById('nev-err');
+    if (!name) { errEl.textContent = 'Please enter an event name.'; errEl.style.display = 'block'; return; }
+    if (!dateVal) { errEl.textContent = 'Please pick a date.'; errEl.style.display = 'block'; return; }
+    errEl.style.display = 'none';
+
+    // Key format: YYYY-M-D (matches calEvents format)
+    const [y, m, d] = dateVal.split('-').map(Number);
+    const key = y + '-' + m + '-' + d;
+
+    const map = getUserEvents();
+    if (!map[key]) map[key] = [];
+    map[key].push(name);
+    putUserEvents(map);
+
+    document.getElementById('new-event-overlay').style.display = 'none';
+    renderCalendar();
 }
 
 function changeMonth(dir) {

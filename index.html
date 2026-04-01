@@ -245,7 +245,7 @@
                             <span class="dash-stat-lbl">Courses enrolled</span>
                         </div>
                     </div>
-                    <div class="dash-stat-chip">
+                    <div class="dash-stat-chip" onclick="goToActiveCourses()" style="cursor:pointer;">
                         <span class="dash-stat-icon">📋</span>
                         <div class="dash-stat-info">
                             <span class="dash-stat-val">Active</span>
@@ -285,7 +285,7 @@
             <div id="calendar-view" style="display:none;">
                 <div class="calendar-header-row">
                     <h2 class="dash-heading" style="margin:0;">Calendar</h2>
-                    <button class="new-event-btn">New event</button>
+                    <button class="new-event-btn" onclick="openNewEventModal()">New event</button>
                 </div>
                 <div class="calendar-controls">
                     <span class="cal-nav-btn" onclick="changeMonth(-1)">◀ <span id="prev-month-label"></span></span>
@@ -306,6 +306,22 @@
                     <span class="cal-footer-link">Full calendar</span>
                     <span style="color:#999"> • </span>
                     <span class="cal-footer-link">Import or export calendars</span>
+                </div>
+            </div>
+
+            <!-- New Event Modal -->
+            <div id="new-event-overlay" class="nev-overlay" style="display:none;" onclick="closeNewEventModal(event)">
+                <div class="nev-modal">
+                    <h3 class="nev-title">New Event</h3>
+                    <label class="nev-label">Event name</label>
+                    <input class="nev-input" id="nev-name" type="text" placeholder="e.g. Lab submission, Quiz…" maxlength="60">
+                    <label class="nev-label">Date</label>
+                    <input class="nev-input" id="nev-date" type="date">
+                    <div id="nev-err" class="nev-err" style="display:none;"></div>
+                    <div class="nev-actions">
+                        <button class="nev-cancel" onclick="closeNewEventModal()">Cancel</button>
+                        <button class="nev-save"   onclick="saveNewEvent()">Add Event</button>
+                    </div>
                 </div>
             </div>
 
