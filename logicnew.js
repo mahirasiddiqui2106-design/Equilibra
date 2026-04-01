@@ -2,6 +2,23 @@
 // ORIGINAL CODE — unchanged from logic.js
 // =====================================================
 
+
+// ── Per-user localStorage scoping ────────────────────
+// All user data is stored under a key prefixed by the
+// logged-in user's email so multiple accounts on the
+// same device stay completely separate.
+
+function authCurrentEmail() {
+    try {
+        var u = JSON.parse(localStorage.getItem('eq_current_user') || 'null');
+        return u && u.email ? u.email.toLowerCase().replace(/[^a-z0-9]/g, '_') : 'guest';
+    } catch(e) { return 'guest'; }
+}
+
+function uKey(base) {
+    return base + '__' + authCurrentEmail();
+}
+
 // ── Scrolling quotes banner ──────────────────────────
 const bannerQuotes = [
     { text: "The secret of getting ahead is getting started.",                                                          author: "Mark Twain"          },
@@ -138,41 +155,149 @@ function showPage(pageId) {
 }
 
 
-function loginUser() {
-    showPage('dashboard');
+// ── Auth helpers ─────────────────────────────────────
+
+const AUTH_KEY = 'eq_users';
+
+function authGetUsers() {
+    try { return JSON.parse(localStorage.getItem(AUTH_KEY) || '[]'); }
+    catch(e) { return []; }
+}
+function authPutUsers(arr) {
+    localStorage.setItem(AUTH_KEY, JSON.stringify(arr));
 }
 
-function updateDashGreeting() {
-    const now = new Date();
-    const hour = now.getHours();
-    let timeLabel = 'Good morning';
-    if (hour >= 12 && hour < 17) timeLabel = 'Good afternoon';
-    else if (hour >= 17) timeLabel = 'Good evening';
+function authHash(str) {
+    let h = 5381;
+    for (let i = 0; i < str.length; i++) h = (h * 33) ^ str.charCodeAt(i);
+    return (h >>> 0).toString(16);
+}
 
-    const timeEl = document.getElementById('dash-time-label');
-    const dateEl = document.getElementById('dash-date-label');
-    if (timeEl) timeEl.textContent = timeLabel;
-    if (dateEl) {
-        dateEl.textContent = now.toLocaleDateString('en-US', {
-            weekday: 'long', month: 'long', day: 'numeric'
-        });
+function authValidEmail(email) {
+    return /^[^s@]+@(gmail.com|yahoo.com|yahoo.co.in|hotmail.com|hotmail.co.uk|vitstudent.ac.in)$/i.test(email.trim());
+}
+
+function authValidPass(pass) { return pass.length >= 6; }
+
+function authClearErrors() {
+    ['login-email-err','login-pass-err','login-msg',
+     'signup-name-err','signup-email-err','signup-pass-err','signup-msg']
+        .forEach(function(id) { var el = document.getElementById(id); if(el){ el.textContent=''; el.className='auth-err'; } });
+}
+
+function authShowErr(id, msg) {
+    var el = document.getElementById(id);
+    if (el) { el.textContent = msg; el.className = 'auth-err auth-err--show'; }
+}
+
+function authShowMsg(id, msg, type) {
+    var el = document.getElementById(id);
+    if (el) { el.textContent = msg; el.className = 'auth-msg auth-msg--' + type; }
+}
+
+function authSwitchTab(tab) {
+    var isLogin = tab === 'login';
+    document.getElementById('tab-login').classList.toggle('active', isLogin);
+    document.getElementById('tab-signup').classList.toggle('active', !isLogin);
+    document.getElementById('auth-login-form').style.display  = isLogin ? 'block' : 'none';
+    document.getElementById('auth-signup-form').style.display = isLogin ? 'none'  : 'block';
+    authClearErrors();
+}
+
+function authTogglePass(inputId, btn) {
+    var inp = document.getElementById(inputId);
+    if (!inp) return;
+    var isText = inp.type === 'text';
+    inp.type = isText ? 'password' : 'text';
+    btn.style.opacity = isText ? '0.5' : '1';
+}
+
+function authLogin() {
+    authClearErrors();
+    var email = document.getElementById('login-email').value.trim();
+    var pass  = document.getElementById('login-pass').value;
+    var ok = true;
+
+    if (!email) {
+        authShowErr('login-email-err', 'Email is required.'); ok = false;
+    } else if (!authValidEmail(email)) {
+        authShowErr('login-email-err', 'Use a Gmail, Yahoo, Hotmail or VIT student email.'); ok = false;
     }
-}
+    if (!pass) {
+        authShowErr('login-pass-err', 'Password is required.'); ok = false;
+    } else if (!authValidPass(pass)) {
+        authShowErr('login-pass-err', 'Password must be at least 6 characters.'); ok = false;
+    }
+    if (!ok) return;
 
+    var users = authGetUsers();
+    var user  = users.find(function(u) { return u.email.toLowerCase() === email.toLowerCase(); });
 
-function showOTP() {
-    const otpBox = document.getElementById("otp-box");
-    if (otpBox) otpBox.style.display = "block";
-}
-
-function verifyOTP() {
-    const otpInput = document.getElementById("otp-input");
-    if (!otpInput || otpInput.value.trim() === "") {
-        alert("Please enter the OTP");
+    if (!user) {
+        authShowMsg('login-msg', 'No account found with this email. Redirecting to Sign Up...', 'warn');
+        setTimeout(function() {
+            authShowMsg('login-msg', '', '');
+            authSwitchTab('signup');
+            document.getElementById('signup-email').value = email;
+            authShowMsg('signup-msg', 'No account found — create one below.', 'info');
+        }, 2000);
         return;
     }
-    showPage('welcome');
+
+    if (user.passHash !== authHash(pass)) {
+        authShowErr('login-pass-err', 'Incorrect password. Please try again.');
+        return;
+    }
+
+    localStorage.setItem('eq_current_user', JSON.stringify({ name: user.name, email: user.email }));
+    authShowMsg('login-msg', 'Welcome back, ' + user.name.split(' ')[0] + '! ✨', 'success');
+    setTimeout(function() { showPage('dashboard'); }, 900);
 }
+
+function authSignup() {
+    authClearErrors();
+    var name  = document.getElementById('signup-name').value.trim();
+    var email = document.getElementById('signup-email').value.trim();
+    var pass  = document.getElementById('signup-pass').value;
+    var ok = true;
+
+    if (!name) {
+        authShowErr('signup-name-err', 'Please enter your name.'); ok = false;
+    }
+    if (!email) {
+        authShowErr('signup-email-err', 'Email is required.'); ok = false;
+    } else if (!authValidEmail(email)) {
+        authShowErr('signup-email-err', 'Use a Gmail, Yahoo, Hotmail or VIT student email.'); ok = false;
+    }
+    if (!pass) {
+        authShowErr('signup-pass-err', 'Password is required.'); ok = false;
+    } else if (!authValidPass(pass)) {
+        authShowErr('signup-pass-err', 'Password must be at least 6 characters.'); ok = false;
+    }
+    if (!ok) return;
+
+    var users = authGetUsers();
+    var exists = users.find(function(u) { return u.email.toLowerCase() === email.toLowerCase(); });
+
+    if (exists) {
+        authShowMsg('signup-msg', 'Account already exists. Redirecting to Log In...', 'warn');
+        setTimeout(function() {
+            authShowMsg('signup-msg', '', '');
+            authSwitchTab('login');
+            document.getElementById('login-email').value = email;
+            authShowMsg('login-msg', 'Account already exists — enter your password to log in.', 'info');
+        }, 2000);
+        return;
+    }
+
+    users.push({ name: name, email: email, passHash: authHash(pass) });
+    authPutUsers(users);
+    localStorage.setItem('eq_current_user', JSON.stringify({ name: name, email: email }));
+    authShowMsg('signup-msg', 'Account created! Welcome to Equilibra ✨', 'success');
+    setTimeout(function() { showPage('dashboard'); }, 900);
+}
+
+function loginUser() { showPage('login'); }
 
 
 function typeWelcomeText() {
@@ -769,11 +894,11 @@ const itemMeta = {
 // ── Progress tracking (localStorage) ────────────────────────────────────────
 
 function loadProgress() {
-    try { return JSON.parse(localStorage.getItem('eq_progress') || '{}'); }
+    try { return JSON.parse(localStorage.getItem(uKey('eq_progress')) || '{}'); }
     catch(e) { return {}; }
 }
 function saveProgress(state) {
-    localStorage.setItem('eq_progress', JSON.stringify(state));
+    localStorage.setItem(uKey('eq_progress'), JSON.stringify(state));
 }
 function isItemDone(courseId, itemLabel) {
     return !!loadProgress()[courseId + '||' + itemLabel];
@@ -1748,7 +1873,7 @@ function selectMood(mood) {
 
 let nemoChatReady         = false;
 let nemoChatSessionActive = false;
-let nemoApiKey            = localStorage.getItem('nemo_groq_key') || '';
+let nemoApiKey            = localStorage.getItem(uKey('nemo_groq_key')) || '';
 let nemoChatHistory       = [];   // [{role:'user'|'assistant', content:'...'}]
 
 const NEMO_SYSTEM_PROMPT =
@@ -1854,7 +1979,7 @@ function nemoSetApiKey() {
     var input = document.getElementById('nemo-key-input');
     if (!input || !input.value.trim()) return;
     nemoApiKey = input.value.trim();
-    localStorage.setItem('nemo_groq_key', nemoApiKey);   // persist across sessions
+    localStorage.setItem(uKey('nemo_groq_key'), nemoApiKey);   // persist across sessions
     var history = document.getElementById('nemo-chat-history');
     if (history) history.innerHTML = '';
     nemoChatHistory = [];
@@ -1868,7 +1993,7 @@ function nemoSetApiKey() {
 
 function nemoForgetApiKey() {
     nemoApiKey = '';
-    localStorage.removeItem('nemo_groq_key');
+    localStorage.removeItem(uKey('nemo_groq_key'));
     nemoInitChat();   // re-show the setup card so user can enter a new key
 }
 
@@ -3765,7 +3890,7 @@ function vbUpdateHistoryBtns() {
 
 function vbSaveState() {
   try {
-    localStorage.setItem('eq_visionboard', JSON.stringify({
+    localStorage.setItem(uKey('eq_visionboard'), JSON.stringify({
       items: VB.items, background: VB.background, topZ: VB.topZ
     }));
   } catch(e) {}
@@ -3773,7 +3898,7 @@ function vbSaveState() {
 
 function vbLoadState() {
   try {
-    var saved = localStorage.getItem('eq_visionboard');
+    var saved = localStorage.getItem(uKey('eq_visionboard'));
     if (!saved) return;
     var data = JSON.parse(saved);
     VB.items      = data.items      || [];
@@ -3828,12 +3953,12 @@ function closeVisionBoard() {
 
 function vbGetSavedBoards() {
   try {
-    return JSON.parse(localStorage.getItem('eq_saved_boards') || '[]');
+    return JSON.parse(localStorage.getItem(uKey('eq_saved_boards')) || '[]');
   } catch(e) { return []; }
 }
 
 function vbPutSavedBoards(arr) {
-  localStorage.setItem('eq_saved_boards', JSON.stringify(arr));
+  localStorage.setItem(uKey('eq_saved_boards'), JSON.stringify(arr));
 }
 
 function vbSaveBoard() {
