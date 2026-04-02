@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Equilibra</title>
     <link rel="stylesheet" href="stylesnew.css">
+    <link rel="stylesheet" href="dark-mode.css">
 </head>
 <body>
 
@@ -218,6 +219,7 @@
             <span class="lms-item" id="nav-mycourses" onclick="switchTab('mycourses-view')">My Courses</span>
             <span class="lms-item" id="nav-calendar" onclick="switchTab('calendar-view')">Calendar</span>
         </nav>
+        <button id="dark-toggle" class="dark-toggle-btn" onclick="toggleDarkMode()" title="Toggle dark mode">🌙</button>
     </header>
 
     <div class="dashboard-body">
@@ -771,8 +773,6 @@
 <!-- Pomodoro toast -->
 <div class="pom-toast" id="pom-toast"></div>
 
-<!-- Dark mode toggle -->
-<button id="dark-toggle" class="dark-toggle-btn" onclick="toggleDarkMode()" title="Toggle dark mode">🌙</button>
 
 <!-- ══ RECHARGE / GAMES PAGE ════════════════════════════════════════════════ -->
 <section id="recharge" class="page recharge-page">
