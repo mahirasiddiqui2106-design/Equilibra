@@ -309,23 +309,6 @@ function typeWelcomeText() {
     }, 90);
 }
 
-(function() {
-    if (localStorage.getItem('eq_dark_mode') === '1') {
-        document.body.classList.add('dark');
-        document.addEventListener('DOMContentLoaded', function() {
-            var btn = document.getElementById('dark-toggle');
-            if (btn) btn.textContent = '☀️';
-        });
-    }
-})();
-
-function toggleDarkMode() {
-    document.body.classList.toggle('dark');
-    var isDark = document.body.classList.contains('dark');
-    localStorage.setItem('eq_dark_mode', isDark ? '1' : '0');
-    var btn = document.getElementById('dark-toggle');
-    if (btn) btn.textContent = isDark ? '☀️' : '🌙';
-}
 
 function updateDashGreeting() {
     const hour = new Date().getHours();
