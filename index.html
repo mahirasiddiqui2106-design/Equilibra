@@ -8,11 +8,9 @@
 </head>
 <body>
 
-
 <div class="floating-banner">
     <div class="banner-track" id="banner-track"></div>
 </div>
-
 
 <section id="landing" class="page active">
     <div class="landing-orb orb-1"></div>
@@ -35,7 +33,7 @@
         </button>
     </div>
 
-    <!-- Nemo peek character — peeks in from the right side -->
+    
     <div class="landing-panda-wrap" id="landing-panda">
         <div class="panda-speech-bubble">Hi! I'm Nemo 🐼</div>
         <span class="panda-sparkle ps1">✨</span>
@@ -43,30 +41,26 @@
 
         <svg class="landing-panda-svg" viewBox="0 0 260 300" xmlns="http://www.w3.org/2000/svg">
 
-            <!-- ── Body (sits mostly off-screen to the right) ── -->
+            
             <ellipse cx="148" cy="238" rx="72" ry="66" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="1.5"/>
 
-            <!-- ── Right arm resting (hangs down, goes off-screen right) ── -->
+            
             <path d="M 190 195 C 202 212, 210 230, 214 248" stroke="#1e1e1e" stroke-width="28" stroke-linecap="round" fill="none"/>
             <circle cx="215" cy="252" r="18" fill="#1e1e1e"/>
 
-            <!-- ── Left arm WAVING ──────────────────────────────────
-                 Shoulder pivot at SVG (62, 196). Group is translated
-                 to that point; arm elements are drawn around (0,0).
-                 SMIL animateTransform rotates the group around (0,0)
-                 which is the shoulder — arm waves toward the viewer. -->
+            
             <g transform="translate(62, 196)">
-                <!-- Arm shaft curves upward-left from shoulder -->
+                
                 <path d="M 0 0 C -5 -20, -16 -44, -28 -60"
                       stroke="#1e1e1e" stroke-width="28" stroke-linecap="round" fill="none"/>
-                <!-- Paw -->
+                
                 <circle cx="-30" cy="-63" r="19" fill="#1e1e1e"/>
-                <!-- Three knuckle bumps -->
+                
                 <circle cx="-42" cy="-76" r="7.5" fill="#2e2e2e"/>
                 <circle cx="-28" cy="-81" r="7.5" fill="#2e2e2e"/>
                 <circle cx="-14" cy="-76" r="7.5" fill="#2e2e2e"/>
 
-                <!-- SMIL wave — arm swings back and forth 4 times, then settles -->
+                
                 <animateTransform
                     attributeName="transform"
                     type="rotate"
@@ -80,47 +74,47 @@
                 />
             </g>
 
-            <!-- ── Head (drawn on top of arm base) ── -->
+            
             <circle cx="96" cy="115" r="68" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="1.5"/>
 
-            <!-- ── Ears ── -->
+            
             <circle cx="36"  cy="58" r="36" fill="#1e1e1e"/>
             <circle cx="156" cy="58" r="36" fill="#1e1e1e"/>
-            <!-- Inner ears — purple theme accent -->
+            
             <circle cx="36"  cy="58" r="20" fill="#6a5cff"/>
             <circle cx="156" cy="58" r="20" fill="#6a5cff"/>
 
-            <!-- ── Eye patches ── -->
+            
             <ellipse cx="72"  cy="112" rx="27" ry="24" fill="#1e1e1e" transform="rotate(-12, 72, 112)"/>
             <ellipse cx="120" cy="112" rx="27" ry="24" fill="#1e1e1e" transform="rotate(12, 120, 112)"/>
 
-            <!-- ── Eyes ── -->
+            
             <circle cx="72"  cy="112" r="14.5" fill="white"/>
             <circle cx="120" cy="112" r="14.5" fill="white"/>
 
-            <!-- ── Pupils — shifted slightly left (glancing toward visitor) ── -->
+            
             <circle cx="70"  cy="114" r="8.5" fill="#1a0a3e"/>
             <circle cx="118" cy="114" r="8.5" fill="#1a0a3e"/>
 
-            <!-- ── Eye shine ── -->
+            
             <circle cx="73"  cy="109" r="3.8" fill="white"/>
             <circle cx="121" cy="109" r="3.8" fill="white"/>
 
-            <!-- ── Nose ── -->
+            
             <ellipse cx="96" cy="136" rx="11" ry="7.5" fill="#1e1e1e"/>
 
-            <!-- ── Mouth — big happy smile ── -->
+            
             <path d="M 78 148 Q 96 170 114 148"
                   stroke="#555" stroke-width="3" fill="none" stroke-linecap="round"/>
 
-            <!-- ── Cheek blush — purple-tinted to match theme ── -->
+            
             <ellipse cx="46"  cy="132" rx="18" ry="12" fill="rgba(106,92,255,0.14)"/>
             <ellipse cx="146" cy="132" rx="18" ry="12" fill="rgba(106,92,255,0.14)"/>
 
-            <!-- ── Tiny cyan scarf at neck — theme accent ── -->
+            
             <ellipse cx="108" cy="182" rx="44" ry="11" fill="#3ccfcf" opacity="0.88"/>
             <ellipse cx="108" cy="175" rx="14"  ry="10" fill="#2ab8b8"/>
-            <!-- Scarf knot detail -->
+            
             <ellipse cx="103" cy="174" rx="7" ry="6" fill="#1e9e9e"/>
             <ellipse cx="114" cy="175" rx="6" ry="5" fill="#1e9e9e"/>
 
@@ -128,26 +122,25 @@
     </div>
 </section>
 
-
 <section id="login" class="page">
     <div class="auth-wrapper">
 
-        <!-- Card -->
+        
         <div class="auth-card">
 
-            <!-- Logo -->
+            
             <div class="auth-logo">
                 <span class="auth-logo-icon">⚖</span>
                 <span class="auth-logo-text">Equilibra</span>
             </div>
 
-            <!-- Tab switcher: Login / Sign Up -->
+            
             <div class="auth-tabs">
                 <button class="auth-tab active" id="tab-login"  onclick="authSwitchTab('login')">Log In</button>
                 <button class="auth-tab"         id="tab-signup" onclick="authSwitchTab('signup')">Sign Up</button>
             </div>
 
-            <!-- ── LOGIN FORM ── -->
+            
             <div id="auth-login-form" class="auth-form">
                 <div class="auth-field">
                     <label class="auth-label">Email</label>
@@ -168,7 +161,7 @@
                 <button class="auth-submit-btn" onclick="authLogin()">Log In →</button>
             </div>
 
-            <!-- ── SIGN UP FORM ── -->
+            
             <div id="auth-signup-form" class="auth-form" style="display:none;">
                 <div class="auth-field">
                     <label class="auth-label">Full Name</label>
@@ -200,7 +193,6 @@
     </div>
 </section>
 
-
 <section id="welcome" class="page">
     <div class="welcome-container">
         <h1 id="welcome-title"></h1>
@@ -209,7 +201,6 @@
         </button>
     </div>
 </section>
-
 
 <section id="dashboard" class="page dashboard-page">
 
@@ -226,7 +217,7 @@
 
         <main class="courses-area">
 
-            <!-- DASHBOARD VIEW -->
+            
             <div id="dashboard-view">
                 <div class="dash-greeting-card">
                     <div class="dash-greeting-left">
@@ -262,7 +253,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- Upcoming deadlines widget -->
+                
                 <div class="deadlines-section" style="display:none;">
                     <p class="dash-sub dash-sub--courses" style="margin-bottom:12px;">⏰ Upcoming deadlines</p>
                     <div class="deadlines-list" id="deadlines-widget"></div>
@@ -272,7 +263,7 @@
                 <div class="course-grid" id="course-grid"></div>
             </div>
 
-            <!-- MY COURSES VIEW -->
+            
             <div id="mycourses-view" style="display:none;">
                 <h2 class="dash-heading">My Courses</h2>
                 <div class="course-filter-row">
@@ -283,7 +274,7 @@
                 <div class="course-grid" id="course-grid-mycourses"></div>
             </div>
 
-            <!-- CALENDAR VIEW -->
+            
             <div id="calendar-view" style="display:none;">
                 <div class="calendar-header-row">
                     <h2 class="dash-heading" style="margin:0;">Calendar</h2>
@@ -311,7 +302,7 @@
                 </div>
             </div>
 
-            <!-- New Event Modal -->
+            
             <div id="new-event-overlay" class="nev-overlay" style="display:none;" onclick="closeNewEventModal(event)">
                 <div class="nev-modal">
                     <h3 class="nev-title">New Event</h3>
@@ -337,8 +328,6 @@
     </div>
 </section>
 
-
-<!-- NEW: Course detail page — appears when a course card is clicked -->
 <section id="course-detail" class="page dashboard-page">
 
     <header class="dashboard-top">
@@ -367,15 +356,13 @@
 
         <aside class="equilibra-panel">
             <h3>Equilibra</h3>
-            <!-- Equilibra cards rendered here by JS when detail page opens -->
+            
             <div class="equilibra-cards" id="detail-equilibra-cards"></div>
         </aside>
 
     </div>
 </section>
 
-
-<!-- ══ NEMO MOOD BUDDY PANEL ════════════════════════════════════════════════ -->
 <div id="nemo-modal-overlay" class="nemo-modal-overlay" onclick="closeNemoOutside(event)">
 <div id="nemo-panel" class="nemo-panel">
 
@@ -447,9 +434,8 @@
   </div>
 
 </div>
-</div><!-- /nemo-modal-overlay -->
+</div>
 
-<!-- Nemo nudge bubble -->
 <div id="nemo-nudge" class="nemo-nudge" style="display:none;">
   <span class="nudge-avatar">🐼</span>
   <div class="nudge-content">
@@ -458,15 +444,11 @@
   </div>
 </div>
 
-<!-- Nemo celebration toast -->
 <div id="nemo-toast" class="nemo-toast" style="display:none;">
   <span class="toast-avatar">🐼</span>
   <span id="nemo-toast-msg"></span>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     STUDENT MIRROR — full-screen page
-     ══════════════════════════════════════════════════════════ -->
 <section id="mirror" class="page mirror-page">
 
   <div class="feature-page-header">
@@ -477,7 +459,7 @@
 
   <div class="mirror-page-body">
 
-    <!-- ── Left info panel (desktop only) ── -->
+    
     <aside class="mirror-side-panel">
       <span class="mirror-side-label">Weekly check-in</span>
       <h2 class="mirror-side-title">Student<br>Mirror</h2>
@@ -556,9 +538,6 @@
   </div>
 </section>
 
-<!-- ══════════════════════════════════════════════════════════
-     UNLOAD WALL — full-screen page
-     ══════════════════════════════════════════════════════════ -->
 <section id="unload" class="page unload-page">
 
   <div class="feature-page-header unload-page-header">
@@ -626,9 +605,6 @@
   </div>
 </section>
 
-<!-- ══════════════════════════════════════════════════════════
-     POMODORO PAGE
-     ══════════════════════════════════════════════════════════ -->
 <section id="pomodoro" class="page">
 
   <div class="pom-header">
@@ -637,10 +613,10 @@
     <span></span>
   </div>
 
-  <!-- 3-column layout: [sound+customize] [clock] [stats+tasks] -->
+  
   <div class="pom-body">
 
-    <!-- ── Col 1: Sound + Customize intervals ── -->
+    
     <div class="pom-col pom-col-left">
 
       <div class="pom-panel-card">
@@ -717,7 +693,7 @@
 
     </div>
 
-    <!-- ── Col 2 (center): Mode tabs + Canvas clock + Controls ── -->
+    
     <div class="pom-col pom-col-center">
 
       <div class="pom-tabs">
@@ -738,7 +714,7 @@
 
     </div>
 
-    <!-- ── Col 3: Stats + Tasks ── -->
+    
     <div class="pom-col pom-col-right">
 
       <div class="pom-stats">
@@ -770,11 +746,8 @@
   </div>
 </section>
 
-<!-- Pomodoro toast -->
 <div class="pom-toast" id="pom-toast"></div>
 
-
-<!-- ══ RECHARGE / GAMES PAGE ════════════════════════════════════════════════ -->
 <section id="recharge" class="page recharge-page">
   <header class="recharge-topbar">
     <button class="recharge-back-btn" onclick="showPage('dashboard')">← Dashboard</button>
@@ -782,7 +755,7 @@
     <div></div>
   </header>
 
-  <!-- Game picker -->
+  
   <div id="recharge-picker" class="recharge-picker">
     <button class="recharge-back-btn" onclick="showPage('dashboard')" style="margin-bottom:16px;">← Dashboard</button>
     <p class="recharge-subtitle">Pick a game — take a mindful break, then get back to it 💪</p>
@@ -808,7 +781,7 @@
     </div>
   </div>
 
-  <!-- Active game arena -->
+  
   <div id="recharge-arena" style="display:none;">
     <button class="recharge-exit-btn" onclick="exitGame()">← All Games</button>
     <div id="game-bubble"></div>
@@ -817,13 +790,12 @@
   </div>
 </section>
 
-<!-- ══ VISION BOARD PAGE ═════════════════════════════════════════════════════ -->
 <section id="vision-board" class="page vb-page">
 
-  <!-- Top bar -->
+  
   <div class="vb-topbar">
 
-    <!-- Left: back to dashboard -->
+    
     <div class="vb-topbar-left">
       <button class="vb-back-btn" onclick="closeVisionBoard()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
@@ -831,7 +803,7 @@
       </button>
     </div>
 
-    <!-- Center: title + undo/redo -->
+    
     <div class="vb-topbar-center">
       <span class="vb-topbar-icon">🎯</span>
       <span class="vb-topbar-title">Vision Board</span>
@@ -844,7 +816,7 @@
       </button>
     </div>
 
-    <!-- Right: actions -->
+    
     <div class="vb-topbar-right">
       <button class="vb-clear-topbtn" onclick="vbClearBoard()">Clear</button>
       <button class="vb-myboards-btn" onclick="vbOpenMyBoards()">
@@ -863,10 +835,10 @@
 
   </div>
 
-  <!-- Editor: sidebar + canvas + props -->
+  
   <div class="vb-editor">
 
-    <!-- Left sidebar -->
+    
     <div class="vb-sidebar">
       <div class="vb-sidetabs" id="vb-sidetabs">
         <button class="vb-sidetab active" data-panel="backgrounds" onclick="vbSwitchPanel('backgrounds',this)">
@@ -893,12 +865,12 @@
       <div id="vb-panel-content" class="vb-panel-content"></div>
     </div>
 
-    <!-- Canvas area -->
+    
     <div class="vb-canvas-area" id="vb-canvas-area" onclick="vbClickCanvas(event)">
       <div class="vb-canvas-outer" id="vb-canvas-outer">
         <div id="vb-canvas" class="vb-canvas">
 
-          <!-- Selection box (shared overlay for selected item) -->
+          
           <div id="vb-sel-box" class="vb-sel-box" style="display:none">
             <div class="vb-h vb-h-nw" data-h="nw"></div>
             <div class="vb-h vb-h-n"  data-h="n"></div>
@@ -917,7 +889,7 @@
       </div>
     </div>
 
-    <!-- Right properties panel -->
+    
     <div class="vb-props" id="vb-props">
       <div class="vb-props-placeholder" id="vb-props-placeholder">
         <div class="vb-props-ph-icon">✦</div>
@@ -930,8 +902,6 @@
 
 </section>
 
-
-<!-- ══ SUBMISSION MODAL ══════════════════════════════════════════════════════ -->
 <div id="submit-modal-overlay" class="course-modal-overlay" onclick="closeSubmitModal()">
     <div class="course-modal" onclick="event.stopPropagation()">
         <button class="course-modal-close" onclick="closeSubmitModal()">✕</button>
@@ -945,7 +915,6 @@
     </div>
 </div>
 
-<!-- ══ MY BOARDS MODAL ═══════════════════════════════════════════════════════ -->
 <div id="vb-myboards-overlay" class="vb-myboards-overlay" onclick="vbCloseMyBoards()">
   <div class="vb-myboards-modal" onclick="event.stopPropagation()">
     <div class="vb-myboards-header">
@@ -956,7 +925,6 @@
   </div>
 </div>
 
-<!-- ══ FORUM MODAL ═══════════════════════════════════════════════════════════ -->
 <div id="forum-modal-overlay" class="course-modal-overlay" onclick="closeForumModal()">
     <div class="course-modal" onclick="event.stopPropagation()">
         <button class="course-modal-close" onclick="closeForumModal()">✕</button>

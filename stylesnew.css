@@ -11,8 +11,6 @@ body {
     background: linear-gradient(135deg,#6a5cff,#7b8cff,#3ccfcf);
 }
 
-
-
 .page {
     display: none;
 }
@@ -36,8 +34,6 @@ body {
     background: #f7f9ff;
 }
 
-
-
 .floating-banner {
     position: fixed;
     top: 0;
@@ -53,7 +49,7 @@ body {
     white-space: nowrap;
     line-height: 60px;
     animation: bannerScroll linear infinite;
-    /* duration set dynamically by JS based on content width */
+    
 }
 
 @keyframes bannerScroll {
@@ -64,10 +60,6 @@ body {
 .banner-quote  { font-size: 13.5px; font-weight: 500; color: #fff; letter-spacing: 0.1px; }
 .banner-author { font-size: 13px; font-style: italic; color: rgba(255,255,255,0.72); margin-left: 4px; }
 .banner-sep    { color: rgba(255,255,255,0.35); margin: 0 32px; font-size: 12px; }
-
-
-
-/* ── Landing page ─────────────────────────────────── */
 
 #landing.page.active {
     position: relative;
@@ -180,30 +172,25 @@ body {
     to   { opacity: 1; transform: translateY(0); }
 }
 
-
-/* ══ NEMO PEEK PANDA (landing page) ══════════════════ */
-
 .landing-panda-wrap {
     position: absolute;
-    /* vertically centred on the landing page */
+    
     top: calc(50% - 130px);
-    /* body partially off-screen to the right — head + arm remain visible */
+    
     right: -90px;
     z-index: 5;
     width: 260px;
-    /* slide in from the right, then gently bob */
+    
     animation:
         pandaPeekSide 1.1s cubic-bezier(0.34, 1.18, 0.64, 1) 0.5s both,
         pandaBob      3.2s ease-in-out 2.4s infinite;
 }
 
-/* Slides in from off-screen right → rests at right:-90px */
 @keyframes pandaPeekSide {
     from { transform: translateX(120%); }
     to   { transform: translateX(0);    }
 }
 
-/* Gentle continuous float after peeking */
 @keyframes pandaBob {
     0%, 100% { transform: translateY(0);     }
     50%       { transform: translateY(-12px); }
@@ -217,7 +204,6 @@ body {
             drop-shadow(0 4px 12px rgba(0,0,0,0.12));
 }
 
-/* ── Speech bubble ───────────────────────────────── */
 .panda-speech-bubble {
     position: absolute;
     top: 44px;
@@ -236,7 +222,7 @@ body {
     transform-origin: right center;
     animation: bubblePop 0.5s cubic-bezier(0.34, 1.3, 0.64, 1) 2.1s forwards;
 }
-/* Tail points right → toward panda */
+
 .panda-speech-bubble::after {
     content: '';
     position: absolute;
@@ -253,7 +239,6 @@ body {
     to   { opacity: 1; transform: scale(1);   }
 }
 
-/* ── Floating sparkles ───────────────────────────── */
 .panda-sparkle {
     position: absolute;
     pointer-events: none;
@@ -278,7 +263,6 @@ body {
     100% { opacity: 0; transform: translateY(-46px) scale(1.2) rotate(45deg); }
 }
 
-/* ── Mobile: shrink and hide bubble ─────────────── */
 @media (max-width: 800px) {
     .landing-panda-wrap {
         width: 180px;
@@ -290,8 +274,6 @@ body {
 @media (max-width: 500px) {
     .landing-panda-wrap { display: none; }
 }
-
-
 
 .primary-btn {
     padding: 14px 36px;
@@ -312,8 +294,6 @@ body {
     cursor: pointer;
     font-size: 14px;
 }
-
-
 
 .login-card {
     background: white;
@@ -355,8 +335,6 @@ body {
     margin-top: 18px;
 }
 
-
-
 .welcome-container {
     text-align: center;
 }
@@ -369,12 +347,9 @@ body {
     margin-bottom: 30px;
 }
 
-
-
 .dashboard-page {
     padding-top: 60px;
 }
-
 
 .dashboard-top {
     position: fixed;
@@ -409,8 +384,6 @@ body {
     font-weight: 600;
 }
 
-
-
 .dashboard-body {
     margin-top: 116px;
     display: grid;
@@ -421,14 +394,9 @@ body {
     margin-right: auto;
 }
 
-
 .courses-area {
     padding: 40px 36px 80px 40px;
 }
-
-
-
-/* ── Dashboard greeting card ──────────────────────── */
 
 .dash-greeting-card {
     display: flex;
@@ -493,8 +461,6 @@ body {
     font-style: italic;
 }
 
-/* ── Dashboard stats chips ────────────────────────── */
-
 .dash-stats-row {
     display: flex;
     gap: 14px;
@@ -555,7 +521,6 @@ body {
     margin-bottom: 16px;
 }
 
-/* keep legacy .dash-heading for any other uses */
 .dash-heading {
     font-size: 28px;
     margin-bottom: 6px;
@@ -646,7 +611,6 @@ body {
     color: #777;
 }
 
-
 .cover-1  { background-image: url("assets/covers/cover1.png"); }
 .cover-2  { background-image: url("assets/covers/cover2.png"); }
 .cover-3  { background-image: url("assets/covers/cover3.png"); }
@@ -660,7 +624,6 @@ body {
 .cover-11 { background-image: url("assets/covers/cover11.png"); }
 .cover-12 { background-image: url("assets/covers/cover12.png"); }
 
-/* New covers — pointing to copied image files */
 .cover-13 { background-image: url("assets/covers/cover13.png"); }
 .cover-14 { background-image: url("assets/covers/cover14.png"); }
 .cover-15 { background-image: url("assets/covers/cover15.png"); }
@@ -670,9 +633,6 @@ body {
 .cover-19 { background-image: url("assets/covers/cover19.png"); }
 .cover-20 { background-image: url("assets/covers/cover20.png"); }
 .cover-21 { background-image: url("assets/covers/cover21.png"); }
-
-
-
 
 .equilibra-panel {
     position: sticky;
@@ -704,7 +664,6 @@ body {
     background: #eef1ff;
     border-left: 2px solid rgba(106,92,255,0.25);
 }
-
 
 .equilibra-card {
     background: white;
@@ -738,8 +697,6 @@ body {
     color: #666;
 }
 
-
-/* ── CALENDAR ── */
 .calendar-header-row {
     display: flex;
     align-items: center;
@@ -759,7 +716,6 @@ body {
 }
 .new-event-btn:hover { background: #1558b0; }
 
-/* ── New Event Modal ── */
 .nev-overlay {
     position: fixed;
     inset: 0;
@@ -836,7 +792,6 @@ body {
 }
 .nev-save:hover { background: #5648e0; }
 
-/* User-added events stand out with a green dot */
 .cal-event--user {
     background: #d1fae5;
     color: #065f46;
@@ -890,7 +845,7 @@ body {
 .cal-day-header {
     display: inline-block;
 }
-/* override — use grid for headers too */
+
 .calendar-grid {
     display: flex;
     flex-direction: column;
@@ -1175,15 +1130,12 @@ body {
 }
 .mark-done-btn:hover { background: #6a5cff; color: white; border-color: #6a5cff; }
 
-/* Submit button (assignments/quizzes) */
 .submit-btn { border-color: #e84b8a; color: #e84b8a; }
 .submit-btn:hover { background: #e84b8a !important; border-color: #e84b8a !important; color: white !important; }
 
-/* Forum open button */
 .forum-btn { border-color: #e05b2b; color: #e05b2b; }
 .forum-btn:hover { background: #e05b2b !important; border-color: #e05b2b !important; color: white !important; }
 
-/* Done state */
 .done-btn {
     background: #f0fdf4 !important;
     border-color: #22c55e !important;
@@ -1193,11 +1145,9 @@ body {
 }
 .done-btn:hover { background: #f0fdf4 !important; border-color: #22c55e !important; color: #16a34a !important; }
 
-/* Done row — whole row dimmed + strikethrough on title */
 .item-done { opacity: 0.6; }
 .item-name-done { text-decoration: line-through; color: #999 !important; }
 
-/* Course code badge on card */
 .course-code-tag {
     display: inline-block;
     font-size: 11px;
@@ -1209,7 +1159,6 @@ body {
     margin-bottom: 3px;
 }
 
-/* ── Deadlines widget ────────────────────────────────── */
 .deadlines-section { margin-bottom: 28px; }
 
 .deadlines-list {
@@ -1251,7 +1200,6 @@ body {
 .deadline-badge.soon    { background: #fff3e0; color: #e07b00; }
 .deadline-badge.urgent  { background: #ffeef0; color: #e63946; }
 
-/* ── Submission & Forum modals ───────────────────────── */
 .course-modal-overlay {
     position: fixed; inset: 0;
     background: rgba(20,18,50,0.52);
@@ -1314,7 +1262,6 @@ body {
 .course-modal-btn.primary   { background: linear-gradient(135deg,#6a5cff,#9b89ff); color: white; }
 .course-modal-btn.secondary { background: #f0f0f5; color: #555; }
 
-/* Forum posts inside modal */
 .forum-modal-body { max-height: 320px; overflow-y: auto; margin-bottom: 18px; }
 .forum-post {
     display: flex; gap: 12px;
@@ -1334,12 +1281,6 @@ body {
 .forum-post-author span { font-weight: 400; color: #aaa; font-size: 12px; }
 .forum-post-text  { font-size: 13px; color: #444; line-height: 1.6; margin: 0 0 4px; }
 .forum-post-time  { font-size: 11px; color: #bbb; margin: 0; }
-
-
-
-/* ══════════════════════════════════════════════════════════════════════════
-   STUDENT MIRROR MODAL
-   ══════════════════════════════════════════════════════════════════════════ */
 
 .mirror-overlay {
     position: fixed;
@@ -1372,7 +1313,6 @@ body {
     to   { opacity: 1; transform: translateY(0)   scale(1);    }
 }
 
-/* ── Close button ── */
 .mirror-close {
     position: absolute;
     top: 16px;
@@ -1393,7 +1333,6 @@ body {
 }
 .mirror-close:hover { background: rgba(255,255,255,0.45); }
 
-/* ── Header ── */
 .mirror-header {
     background: linear-gradient(135deg, #5a4cef 0%, #8b78ff 55%, #c4b5fd 100%);
     padding: 44px 36px 36px;
@@ -1406,10 +1345,8 @@ body {
 .mirror-title  { font-size: 26px; font-weight: 700; margin: 0 0 8px; color: white; }
 .mirror-subtitle { font-size: 14px; margin: 0; color: rgba(255,255,255,0.88); line-height: 1.5; }
 
-/* ── Form ── */
 .mirror-form { padding: 28px 32px 32px; }
 
-/* ── Question cards ── */
 .mirror-q-card {
     background: #faf9ff;
     border: 1.5px solid #ece8ff;
@@ -1444,7 +1381,6 @@ body {
     line-height: 1.55;
 }
 
-/* ── Warm option buttons ── */
 .mirror-options { display: flex; flex-direction: column; gap: 10px; }
 .mirror-opt-btn {
     background: white;
@@ -1467,7 +1403,6 @@ body {
     font-weight: 600;
 }
 
-/* ── Scale sliders ── */
 .mirror-scale-wrap  { display: flex; flex-direction: column; gap: 10px; }
 .mirror-scale-labels {
     display: flex;
@@ -1530,7 +1465,6 @@ body {
     text-align: center;
 }
 
-/* ── Submit button ── */
 .mirror-submit-btn {
     display: block;
     width: 100%;
@@ -1549,10 +1483,8 @@ body {
 }
 .mirror-submit-btn:hover { opacity: 0.92; transform: translateY(-1px); }
 
-/* ══ RESULTS ══════════════════════════════════════════════════════════════ */
 .mirror-results { padding: 28px 32px 36px; }
 
-/* Score section */
 .burnout-score-section { text-align: center; margin-bottom: 36px; }
 .burnout-intro { font-size: 14px; color: #888; margin: 0 0 26px; line-height: 1.5; }
 
@@ -1564,7 +1496,6 @@ body {
     flex-wrap: wrap;
 }
 
-/* SVG ring */
 .burnout-ring-wrap {
     position: relative;
     width: 148px;
@@ -1604,7 +1535,6 @@ body {
 }
 .burnout-score-denom { font-size: 13px; color: #bbb; display: block; margin-top: 3px; }
 
-/* Level badge + message */
 .burnout-level-text { max-width: 250px; text-align: left; }
 .burnout-level-badge {
     display: inline-block;
@@ -1617,7 +1547,6 @@ body {
 }
 .burnout-message { font-size: 13.5px; color: #555; line-height: 1.65; margin: 0; }
 
-/* Radar */
 .burnout-radar-section { text-align: center; margin-bottom: 32px; }
 .radar-heading {
     font-size: 11px;
@@ -1647,7 +1576,6 @@ body {
 .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink:0; }
 .legend-text {}
 
-/* Dimension bars */
 .burnout-dimensions { margin-bottom: 30px; }
 .dims-heading {
     font-size: 11px;
@@ -1691,7 +1619,6 @@ body {
     text-align: right;
 }
 
-/* Retake / close row */
 .mirror-retake-row {
     display: flex;
     gap: 12px;
@@ -1726,13 +1653,6 @@ body {
 }
 .mirror-close-btn:hover { opacity: 0.9; }
 
-
-
-/* ══════════════════════════════════════════════════════════════════════════
-   NEMO MOOD BUDDY
-   ══════════════════════════════════════════════════════════════════════════ */
-
-/* ── Modal overlay backdrop ─────────────────────────────────────────────── */
 .nemo-modal-overlay {
     position: fixed;
     inset: 0;
@@ -1746,14 +1666,13 @@ body {
 }
 .nemo-modal-overlay.active { display: flex; }
 
-/* ── Panel card (centered modal) ────────────────────────────────────────── */
 .nemo-panel {
     background: #fff;
     border-radius: 24px;
     width: 100%;
     max-width: 660px;
     max-height: 88vh;
-    overflow: hidden;   /* panel itself does NOT scroll — only chat-history does */
+    overflow: hidden;   
     box-shadow: 0 24px 64px rgba(0,0,0,0.22);
     display: flex;
     flex-direction: column;
@@ -1764,7 +1683,6 @@ body {
     to   { opacity: 1; transform: translateY(0)    scale(1);    }
 }
 
-/* ── Header ─────────────────────────────────────────────────────────────── */
 .nemo-panel-header {
     background: linear-gradient(160deg, #f5f2ff 0%, #e8f5e9 100%);
     padding: 20px 20px 14px;
@@ -1805,7 +1723,6 @@ body {
     line-height: 1.4;
 }
 
-/* ── CSS Panda ──────────────────────────────────────────────────────────── */
 .nemo-panda {
     position: relative;
     width: 96px;
@@ -1819,7 +1736,6 @@ body {
     50%       { transform: translateY(-5px); }
 }
 
-/* Ears — behind head */
 .panda-ear {
     position: absolute;
     width: 28px;
@@ -1832,7 +1748,6 @@ body {
 .panda-ear.left  { left: 4px; }
 .panda-ear.right { right: 4px; }
 
-/* Inner ear highlight */
 .panda-ear::after {
     content: '';
     width: 13px;
@@ -1845,7 +1760,6 @@ body {
     transform: translate(-50%, -50%);
 }
 
-/* Head */
 .panda-head {
     position: absolute;
     width: 88px;
@@ -1858,7 +1772,6 @@ body {
     z-index: 2;
 }
 
-/* Eye patches */
 .panda-eye-patch {
     position: absolute;
     width: 25px;
@@ -1871,7 +1784,6 @@ body {
 .panda-eye-patch.left  { left: 9px;  transform: rotate(-16deg); }
 .panda-eye-patch.right { right: 9px; transform: rotate(16deg);  }
 
-/* Eyes */
 .panda-eye {
     position: absolute;
     width: 11px;
@@ -1884,7 +1796,6 @@ body {
 .panda-eye.left  { left: 14px;  }
 .panda-eye.right { right: 14px; }
 
-/* Pupils */
 .panda-eye::after {
     content: '';
     position: absolute;
@@ -1896,7 +1807,6 @@ body {
     left: 2px;
 }
 
-/* Eye shine */
 .panda-eye::before {
     content: '';
     position: absolute;
@@ -1909,7 +1819,6 @@ body {
     z-index: 5;
 }
 
-/* Nose */
 .panda-nose {
     position: absolute;
     width: 12px;
@@ -1922,7 +1831,6 @@ body {
     z-index: 4;
 }
 
-/* Mouth — default: small smile */
 .panda-mouth {
     position: absolute;
     width: 20px;
@@ -1936,7 +1844,6 @@ body {
     z-index: 4;
 }
 
-/* Cheeks */
 .panda-cheek {
     position: absolute;
     width: 17px;
@@ -1949,9 +1856,6 @@ body {
 .panda-cheek.left  { left: 4px;  }
 .panda-cheek.right { right: 4px; }
 
-/* ── Mood expression modifiers ── */
-
-/* great — big smile, rosy cheeks */
 .nemo-panda.panda-great .panda-mouth {
     width: 28px;
     height: 14px;
@@ -1962,7 +1866,6 @@ body {
     width: 20px;
 }
 
-/* meh — flat line */
 .nemo-panda.panda-meh .panda-mouth {
     border-bottom: none;
     border-top: 2.5px solid #444;
@@ -1973,7 +1876,6 @@ body {
 }
 .nemo-panda.panda-meh .panda-cheek { opacity: 0.3; }
 
-/* tired — droopy frown */
 .nemo-panda.panda-tired .panda-mouth {
     border-bottom: none;
     border-top: 2.5px solid #444;
@@ -1983,11 +1885,10 @@ body {
     top: 58px;
 }
 .nemo-panda.panda-tired .panda-eye {
-    top: 27px; /* slight droop */
+    top: 27px; 
 }
 .nemo-panda.panda-tired .panda-cheek { opacity: 0.2; }
 
-/* struggling / caring — sad frown */
 .nemo-panda.panda-struggling .panda-mouth,
 .nemo-panda.panda-caring .panda-mouth {
     border-bottom: none;
@@ -2002,7 +1903,6 @@ body {
     background: rgba(180, 180, 255, 0.35);
 }
 
-/* ── Breathing animations ── */
 .nemo-panda.breathing { animation: none; }
 
 @keyframes nemo-grow {
@@ -2022,10 +1922,9 @@ body {
 .nemo-panda.breathe-hold { animation: nemo-hold   2s linear   forwards !important; }
 .nemo-panda.breathe-out  { animation: nemo-shrink 6s ease-out forwards !important; }
 
-/* ── Panel body (screens) ───────────────────────────────────────────────── */
 .nemo-panel-body {
     padding: 18px 18px 6px;
-    min-height: 0;      /* allow flex shrinking so tabs are never pushed out */
+    min-height: 0;      
     flex: 1;
     overflow: hidden;
 }
@@ -2039,7 +1938,6 @@ body {
     line-height: 1.45;
 }
 
-/* Mood Pulse */
 .nemo-mood-faces {
     display: flex;
     justify-content: space-between;
@@ -2092,7 +1990,6 @@ body {
     to   { opacity: 1; transform: translateY(0);   }
 }
 
-/* Chat Therapist */
 .nemo-chat-screen {
     flex: 1;
     display: flex;
@@ -2138,7 +2035,6 @@ body {
     border-bottom-right-radius: 5px;
 }
 
-/* Typing indicator */
 .nemo-typing {
     display: flex;
     gap: 5px;
@@ -2213,7 +2109,6 @@ body {
 .nemo-chat-send-btn:hover  { opacity: 0.9; }
 .nemo-chat-send-btn:disabled { opacity: 0.35; cursor: default; }
 
-/* API key setup card */
 .nemo-setup-card {
     background: #f5f2ff;
     border-radius: 16px;
@@ -2279,7 +2174,6 @@ body {
 }
 .nemo-setup-card .setup-btn:hover { opacity: 0.88; }
 
-/* AI key status bar (shown when a saved key is active) */
 .nemo-key-status {
     font-size: 11px;
     color: #aaa;
@@ -2293,7 +2187,6 @@ body {
 }
 .nemo-change-key-btn:hover { text-decoration: underline; }
 
-/* Breathe */
 .breathe-phase-label {
     text-align: center;
     font-size: 19px;
@@ -2351,7 +2244,6 @@ body {
     font-weight: 500;
 }
 
-/* ── Tab bar ────────────────────────────────────────────────────────────── */
 .nemo-tabs {
     display: flex;
     border-top: 1px solid #f0eeff;
@@ -2375,7 +2267,6 @@ body {
 .nemo-tab:hover  { color: #6a5cff; background: #f0eeff; }
 .nemo-tab.active { color: #6a5cff; background: #eeeaff; }
 
-/* ── Stress nudge bubble ────────────────────────────────────────────────── */
 .nemo-nudge {
     position: fixed;
     bottom: 28px;
@@ -2427,7 +2318,6 @@ body {
 .nudge-slide-in  { animation: nudgeIn  0.35s ease forwards; }
 .nudge-slide-out { animation: nudgeOut 0.3s  ease forwards; }
 
-/* ── Celebration toast ──────────────────────────────────────────────────── */
 .nemo-toast {
     position: fixed;
     bottom: 28px;
@@ -2460,11 +2350,6 @@ body {
 .toast-slide-in  { animation: toastIn  0.38s cubic-bezier(0.34,1.2,0.64,1) forwards; }
 .toast-slide-out { animation: toastOut 0.3s  ease                           forwards; }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   UNLOAD WALL
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* ── Overlay & modal shell ─────────────────────────────────────────────── */
 .unload-overlay {
     position: fixed; inset: 0;
     background: rgba(10, 8, 30, 0.72);
@@ -2491,7 +2376,6 @@ body {
     to   { opacity: 1; transform: translateY(0)    scale(1);    }
 }
 
-/* ── Header ───────────────────────────────────────────────────────────── */
 .unload-header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 20px 22px 16px;
@@ -2512,7 +2396,6 @@ body {
 }
 .unload-close-btn:hover { background: rgba(255,255,255,0.16); color: #fff; }
 
-/* ── Mode switcher ────────────────────────────────────────────────────── */
 .unload-mode-switcher {
     display: flex; gap: 8px; padding: 14px 22px 10px;
     flex-shrink: 0;
@@ -2532,10 +2415,8 @@ body {
     border-color: rgba(255,255,255,0.28); color: rgba(255,255,255,0.75);
 }
 
-/* ── Screens ──────────────────────────────────────────────────────────── */
 .unload-screen { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 
-/* ── Draw screen ──────────────────────────────────────────────────────── */
 .unload-canvas-wrap {
     flex: 1; margin: 0 22px 10px;
     background: #faf8f2;
@@ -2550,7 +2431,6 @@ body {
     padding: 0 22px 10px; flex-wrap: wrap; flex-shrink: 0;
 }
 
-/* Color swatches */
 .unload-colors { display: flex; gap: 7px; align-items: center; }
 .unload-color-swatch {
     width: 22px; height: 22px; border-radius: 50%;
@@ -2561,7 +2441,6 @@ body {
 .unload-color-swatch:hover  { transform: scale(1.2); }
 .unload-color-swatch.active { border-color: #fff; transform: scale(1.25); }
 
-/* Size pills */
 .unload-sizes { display: flex; gap: 5px; }
 .unload-size-btn {
     width: 28px; height: 28px; border-radius: 8px;
@@ -2575,7 +2454,6 @@ body {
     border-color: rgba(255,255,255,0.35);
 }
 
-/* Tool buttons (eraser, clear) */
 .unload-tool-btn {
     padding: 6px 13px; border-radius: 10px;
     border: 1.5px solid rgba(255,255,255,0.12);
@@ -2586,7 +2464,6 @@ body {
 .unload-tool-btn:hover  { border-color: rgba(255,255,255,0.28); color: rgba(255,255,255,0.8); }
 .unload-tool-btn.active { background: rgba(255,255,255,0.14); color: #fff; border-color: rgba(255,255,255,0.3); }
 
-/* ── Type screen ──────────────────────────────────────────────────────── */
 .unload-textarea {
     flex: 1; margin: 0 22px 10px;
     background: #faf8f2;
@@ -2599,7 +2476,6 @@ body {
 }
 .unload-textarea::placeholder { color: #bbb; font-style: italic; }
 
-/* ── Release section ──────────────────────────────────────────────────── */
 .unload-release-section {
     padding: 10px 22px 18px;
     display: flex; align-items: center; justify-content: space-between;
@@ -2639,7 +2515,6 @@ body {
     50%       { box-shadow: 0 0 0 8px rgba(230, 57, 70, 0); }
 }
 
-/* ── Tear animation ───────────────────────────────────────────────────── */
 .unload-tearing-top {
     animation: unloadTearTop 0.6s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
@@ -2657,7 +2532,6 @@ body {
     100% { transform: translateY(130%) rotate(6deg); opacity: 0; }
 }
 
-/* ── Gone popup ───────────────────────────────────────────────────────── */
 .unload-gone-popup {
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
@@ -2692,10 +2566,6 @@ body {
     text-shadow: 0 2px 20px rgba(155,137,255,0.6);
 }
 
-
-/* ══════════════════════════════════════════════════
-   POMODORO PAGE
-   ══════════════════════════════════════════════════ */
 #pomodoro.page.active {
     min-height: 100vh;
     background: #f7f9ff;
@@ -2743,7 +2613,6 @@ body {
 .pom-col-center { align-items: center; }
 .pom-col-left, .pom-col-right { align-items: stretch; }
 
-/* Tabs */
 .pom-tabs {
     display: flex; gap: 6px;
     background: #eef1ff; padding: 5px; border-radius: 50px;
@@ -2756,7 +2625,6 @@ body {
 }
 .pom-tab.active { background: #6a5cff; color: white; }
 
-/* Canvas */
 .pom-canvas-wrap {
     cursor: pointer;
     filter: drop-shadow(0 8px 24px rgba(106,92,255,0.18));
@@ -2769,7 +2637,6 @@ body {
 .pom-tasks-card { flex: 1; }
 .pom-task-list { max-height: 260px; overflow-y: auto; }
 
-/* Controls */
 .pom-controls { display: flex; align-items: center; gap: 14px; }
 
 .pom-btn-icon {
@@ -2792,7 +2659,6 @@ body {
 }
 .pom-btn-main:hover { transform: scale(1.06); }
 
-/* Panel cards */
 .pom-panel-card {
     background: white; border-radius: 16px;
     padding: 16px 20px;
@@ -2806,7 +2672,6 @@ body {
     color: #9ca3af; margin-bottom: 12px;
 }
 
-/* Sound */
 .pom-sound-options { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
 .pom-sound-btn {
     border: 1.5px solid #e5e7f0; background: white; color: #6b7280;
@@ -2829,7 +2694,6 @@ body {
 }
 #pom-vol-val { font-size: 12px; color: #9ca3af; min-width: 32px; }
 
-/* Stepper controls */
 .pom-stepper-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
 
 .pom-stepper-row {
@@ -2882,7 +2746,6 @@ body {
 }
 .pom-apply-btn:hover { opacity: 0.85; }
 
-/* Stats */
 .pom-stats { display: flex; gap: 12px; width: 100%; }
 .pom-stat {
     flex: 1; background: white; border-radius: 14px;
@@ -2892,7 +2755,6 @@ body {
 .pom-stat-val { font-family: 'Poppins', sans-serif; font-size: 1.8rem; font-weight: 700; color: #6a5cff; }
 .pom-stat-lbl { font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
 
-/* Task list */
 .pom-task-input-wrap { display: flex; gap: 8px; margin-bottom: 12px; }
 .pom-task-input {
     flex: 1; background: #f7f9ff; border: 1.5px solid #e5e7f0;
@@ -2929,7 +2791,6 @@ body {
 }
 .pom-task-del:hover { color: #6a5cff; }
 
-/* Toast */
 .pom-toast {
     position: fixed; bottom: 28px; left: 50%;
     transform: translateX(-50%) translateY(80px);
@@ -2953,11 +2814,6 @@ body {
     .pom-stepper-label { min-width: 100px; font-size: 12px; }
 }
 
-
-/* ══════════════════════════════════════════════════════════
-   SHARED FULL-SCREEN FEATURE PAGE HEADER
-   (used by Mirror, Unload Wall — matches Pomodoro style)
-   ══════════════════════════════════════════════════════════ */
 .feature-page-header {
     position: fixed;
     top: 60px; left: 0; width: 100%; height: 56px;
@@ -2979,9 +2835,6 @@ body {
 
 .feature-page-title { font-size: 16px; font-weight: 700; color: #1a1a2e; }
 
-/* ══════════════════════════════════════════════════════════
-   STUDENT MIRROR — FULL-SCREEN PAGE
-   ══════════════════════════════════════════════════════════ */
 #mirror.page.active {
     display: block;
     min-height: 100vh;
@@ -3001,7 +2854,6 @@ body {
     min-height: calc(100vh - 116px);
 }
 
-/* ── Left info sidebar ───────────────────────────────── */
 .mirror-side-panel {
     position: sticky;
     top: 130px;
@@ -3076,7 +2928,6 @@ body {
     padding-top: 18px;
 }
 
-/* ── Right: modal card fills its column ─────────────── */
 .mirror-page .mirror-modal {
     max-height: none;
     width: 100%;
@@ -3085,7 +2936,6 @@ body {
     animation: mirrorFadeIn 0.35s cubic-bezier(0.34,1.2,0.64,1);
 }
 
-/* On desktop hide the redundant inner header — sidebar covers it */
 @media (min-width: 860px) {
     .mirror-page .mirror-header { display: none; }
     .mirror-page .mirror-modal  { border-radius: 20px; }
@@ -3093,10 +2943,8 @@ body {
     .mirror-page .mirror-results { padding-top: 32px; }
 }
 
-/* Remove the close button since we have ← Back */
 .mirror-page .mirror-close { display: none; }
 
-/* ── Narrow screens: collapse to single column ───────── */
 @media (max-width: 859px) {
     .mirror-page-body {
         grid-template-columns: 1fr;
@@ -3107,10 +2955,6 @@ body {
     .mirror-page .mirror-modal { border-radius: 24px; max-width: 720px; margin: 0 auto; }
 }
 
-
-/* ══════════════════════════════════════════════════════════
-   UNLOAD WALL — FULL-SCREEN PAGE
-   ══════════════════════════════════════════════════════════ */
 #unload.page.active {
     display: block;
     min-height: 100vh;
@@ -3158,7 +3002,6 @@ body {
     margin: 0;
 }
 
-/* Draw screen: canvas takes full available height */
 .unload-draw-fullscreen {
     flex: 1;
     display: flex;
@@ -3182,7 +3025,6 @@ body {
     cursor: crosshair;
 }
 
-/* Type screen: tall textarea */
 .unload-type-fullscreen {
     flex: 1;
 }
@@ -3206,10 +3048,6 @@ body {
     .unload-type-fullscreen .unload-textarea   { min-height: 280px; }
 }
 
-
-/* ═══════════════════════════════════════════════════════
-   RECHARGE — GAMES
-   ═══════════════════════════════════════════════════════ */
 .recharge-page { min-height: 100vh; background: #f7f5ff; }
 #recharge.page.active { display: flex; flex-direction: column; }
 
@@ -3245,7 +3083,6 @@ body {
 .recharge-exit-btn { align-self: center; background: none; border: 1.5px solid #d0cbff; color: #6a5cff; padding: 8px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 600; cursor: pointer; margin-bottom: 24px; transition: background 0.15s; }
 .recharge-exit-btn:hover { background: #eeeaff; }
 
-/* Bubble Pop */
 #game-bubble { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px; margin: 0 auto; }
 .bp-header { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 560px; margin-bottom: 10px; }
 .bp-score-label { font-size: 16px; font-weight: 600; color: #1a1a2e; }
@@ -3254,7 +3091,6 @@ body {
 .bp-canvas { border-radius: 16px; background: #1a1333; cursor: crosshair; box-shadow: 0 8px 32px rgba(106,92,255,0.18); max-width: 100%; }
 .bp-hint { font-size: 13px; color: #999; margin-top: 10px; }
 
-/* Memory Match */
 #game-memory { width: 100%; max-width: 520px; margin: 0 auto; }
 .mm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 14px; font-weight: 600; color: #444; }
 .mm-new-btn { padding: 6px 16px; border-radius: 8px; border: 1.5px solid #d0cbff; background: white; color: #6a5cff; font-weight: 600; font-size: 13px; cursor: pointer; }
@@ -3269,7 +3105,6 @@ body {
 .mm-card.mm-matched .mm-back { background: #d1fae5; border-color: #34d399; }
 .mm-win { margin-top: 18px; text-align: center; font-size: 16px; font-weight: 700; color: #059669; background: #d1fae5; padding: 14px 24px; border-radius: 12px; }
 
-/* 2048 */
 #game-2048 { width: 100%; max-width: 420px; margin: 0 auto; }
 .g48-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 12px; }
 .g48-title-block { display: flex; flex-direction: column; }
@@ -3290,24 +3125,18 @@ body {
     .recharge-picker { padding: 32px 20px 40px; }
 }
 
-/* ═══════════════════════════════════════════════════════
-   VISION BOARD v2  —  Kittl-inspired
-   ═══════════════════════════════════════════════════════ */
-
-/* ── Page shell ── */
 .vb-page {
   display: none !important;
   flex-direction: column;
   overflow: hidden;
   background: #12101e;
-  /* Cover full viewport including behind the fixed banner */
+  
   position: fixed !important;
   inset: 0;
   z-index: 1100;
 }
 .vb-page.active { display: flex !important; }
 
-/* ── Top bar ── */
 .vb-topbar {
   display: flex;
   align-items: center;
@@ -3372,7 +3201,6 @@ body {
 }
 .vb-download-btn:hover { opacity: 0.88; transform: translateY(-1px); }
 
-/* ── Editor layout ── */
 .vb-editor {
   display: flex;
   flex: 1;
@@ -3380,7 +3208,6 @@ body {
   overflow: hidden;
 }
 
-/* ── Left sidebar ── */
 .vb-sidebar {
   display: flex;
   flex-shrink: 0;
@@ -3438,7 +3265,6 @@ body {
   margin: -4px 0 12px; line-height: 1.4;
 }
 
-/* ── Background grid ── */
 .vb-bg-grid {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
 }
@@ -3463,7 +3289,6 @@ body {
 .vb-custom-row input[type=color] { width: 32px; height: 32px; border: none; border-radius: 6px; cursor: pointer; padding: 0; }
 .vb-custom-row label { font-size: 12px; color: rgba(255,255,255,0.5); cursor: pointer; }
 
-/* ── Text presets ── */
 .vb-text-presets { display: flex; flex-direction: column; gap: 6px; }
 .vb-text-preset {
   background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
@@ -3474,7 +3299,6 @@ body {
 .vb-text-preset-sample { margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .vb-text-preset-name { font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 0.4px; }
 
-/* ── Sticker grid ── */
 .vb-sticker-sec-label { font-size: 10px; color: rgba(255,255,255,0.28); text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 0 6px; }
 .vb-sticker-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 6px; }
 .vb-sticker-pick {
@@ -3485,7 +3309,6 @@ body {
 }
 .vb-sticker-pick:hover { background: rgba(167,139,250,0.15); transform: scale(1.15); }
 
-/* ── Shapes grid ── */
 .vb-shapes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .vb-shape-tile {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -3497,7 +3320,6 @@ body {
 .vb-shape-tile span { font-size: 9px; color: rgba(255,255,255,0.38); text-align: center; }
 .vb-shape-tile:hover { background: rgba(167,139,250,0.12); border-color: rgba(167,139,250,0.35); }
 
-/* ── Photo upload ── */
 .vb-upload-zone {
   border: 2px dashed rgba(167,139,250,0.3); border-radius: 12px;
   padding: 32px 16px; text-align: center; cursor: pointer;
@@ -3511,7 +3333,6 @@ body {
 .vb-upload-text { font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 500; }
 .vb-upload-sub { font-size: 11px; color: rgba(255,255,255,0.28); }
 
-/* ── Canvas area ── */
 .vb-canvas-area {
   flex: 1; min-width: 0;
   display: flex; align-items: center; justify-content: center;
@@ -3534,7 +3355,6 @@ body {
   background: #fff;
 }
 
-/* ── Selection box ── */
 .vb-sel-box {
   position: absolute;
   pointer-events: none;
@@ -3549,7 +3369,6 @@ body {
   pointer-events: none;
 }
 
-/* Resize handles */
 .vb-h {
   position: absolute;
   width: 10px; height: 10px;
@@ -3566,7 +3385,6 @@ body {
 .vb-h-sw { bottom: -5px; left: -5px; cursor: sw-resize; }
 .vb-h-w  { top: calc(50% - 5px); left: -5px; cursor: w-resize; }
 
-/* Rotate handle */
 .vb-rot-handle {
   position: absolute;
   top: -32px; left: calc(50% - 12px);
@@ -3586,11 +3404,9 @@ body {
   background: rgba(124,58,237,0.6);
 }
 
-/* ── Items on canvas ── */
 .vb-item { position: absolute; transform-origin: center center; }
 .vb-item:hover { outline: 1px dashed rgba(124,58,237,0.35); }
 
-/* ── Right properties panel ── */
 .vb-props {
   width: 224px; flex-shrink: 0;
   background: #1c1929;
@@ -3615,7 +3431,6 @@ body {
 .vb-props-inner::-webkit-scrollbar { width: 4px; }
 .vb-props-inner::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
-/* Prop: actions */
 .vb-prop-actions { display: flex; gap: 6px; }
 .vb-prop-action-btn {
   flex: 1; padding: 7px 6px; border-radius: 8px; font-size: 11px;
@@ -3627,22 +3442,18 @@ body {
 .vb-prop-del { border-color: rgba(255,80,80,0.2); color: rgba(255,120,120,0.7); }
 .vb-prop-del:hover { background: rgba(255,80,80,0.1); color: #ff8080; }
 
-/* Prop: section */
 .vb-prop-section { margin-bottom: 2px; }
 .vb-prop-sec-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.7px; color: rgba(255,255,255,0.28); }
 
-/* Prop: W/H display */
 .vb-prop-wh { display: flex; gap: 8px; margin-top: 6px; }
 .vb-wh-box { flex: 1; background: rgba(255,255,255,0.05); border-radius: 6px; padding: 6px 8px; display: flex; align-items: center; gap: 5px; }
 .vb-wh-letter { font-size: 10px; color: rgba(255,255,255,0.35); font-weight: 600; }
 .vb-wh-val { font-size: 13px; color: rgba(255,255,255,0.7); font-variant-numeric: tabular-nums; }
 
-/* Prop: row */
 .vb-prop-row { display: flex; align-items: center; gap: 8px; min-height: 30px; }
 .vb-prop-label { font-size: 11px; color: rgba(255,255,255,0.4); min-width: 54px; flex-shrink: 0; }
 .vb-prop-unit { font-size: 11px; color: rgba(255,255,255,0.3); }
 
-/* Prop: slider */
 .vb-slider-row { gap: 6px; }
 .vb-prop-slider {
   flex: 1; height: 4px; -webkit-appearance: none; appearance: none;
@@ -3654,7 +3465,6 @@ body {
 }
 .vb-prop-val { font-size: 11px; color: rgba(255,255,255,0.5); min-width: 34px; text-align: right; }
 
-/* Prop: number input */
 .vb-prop-number {
   width: 60px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
   border-radius: 6px; color: #fff; font-size: 13px; padding: 4px 8px; outline: none;
@@ -3662,17 +3472,14 @@ body {
 }
 .vb-prop-number::-webkit-inner-spin-button { -webkit-appearance: none; }
 
-/* Prop: select */
 .vb-prop-select {
   flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
   border-radius: 6px; color: #fff; font-size: 12px; padding: 5px 8px; outline: none; cursor: pointer;
 }
 .vb-prop-select option { background: #2a2445; }
 
-/* Prop: separator */
 .vb-prop-sep { height: 1px; background: rgba(255,255,255,0.07); margin: 4px 0; }
 
-/* Prop: layer buttons */
 .vb-prop-layer-row { display: flex; gap: 6px; }
 .vb-layer-btn {
   flex: 1; padding: 5px 4px; border-radius: 6px; font-size: 11px;
@@ -3681,7 +3488,6 @@ body {
 }
 .vb-layer-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
 
-/* Prop: style buttons (B/I/U + align) */
 .vb-style-btns { display: flex; gap: 4px; flex-wrap: wrap; }
 .vb-style-btn {
   width: 28px; height: 28px; border-radius: 6px; font-size: 12px;
@@ -3692,7 +3498,6 @@ body {
 .vb-style-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
 .vb-style-btn.active { background: rgba(167,139,250,0.2); border-color: #a78bfa; color: #c4b5fd; }
 
-/* Prop: color swatch */
 .vb-color-wrap { position: relative; display: flex; align-items: center; gap: 8px; }
 .vb-color-swatch {
   width: 30px; height: 30px; border-radius: 6px; cursor: pointer;
@@ -3703,7 +3508,6 @@ body {
 .vb-color-swatch:hover { transform: scale(1.1); }
 .vb-color-pick-hidden { opacity: 0; position: absolute; width: 0; height: 0; pointer-events: none; }
 
-/* Prop: bg color row */
 .vb-bg-color-wrap { display: flex; gap: 6px; align-items: center; }
 .vb-none-btn {
   padding: 4px 8px; border-radius: 6px; font-size: 11px;
@@ -3718,7 +3522,6 @@ body {
   cursor: pointer; padding: 0; background: none;
 }
 
-/* ── Pinterest & URL photo panel ── */
 .vb-pinterest-btn {
   display: flex; align-items: center; gap: 8px;
   width: 100%; padding: 10px 14px;
@@ -3770,7 +3573,6 @@ body {
   content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08);
 }
 
-/* ── Dashboard vision board widget ── */
 .vb-dash-widget {
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
@@ -3799,7 +3601,6 @@ body {
   min-height: 80px; display: flex; justify-content: center;
 }
 
-/* Empty state */
 .vb-dash-empty {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 8px; padding: 28px 16px; width: 100%;
@@ -3817,7 +3618,6 @@ body {
 }
 .vb-dash-empty-btn:hover { background: rgba(167,139,250,0.28); }
 
-/* Mini board preview */
 .vb-dash-mini-outer {
   position: relative; border-radius: 8px; overflow: hidden;
   box-shadow: 0 4px 20px rgba(0,0,0,0.35);
@@ -3825,7 +3625,7 @@ body {
   flex-shrink: 0;
 }
 .vb-dash-mini-inner {
-  display: block; /* layout handled by inline styles in JS */
+  display: block; 
 }
 .vb-dash-mini-overlay {
   position: absolute; inset: 0;
@@ -3842,7 +3642,6 @@ body {
 .vb-dash-mini-outer:hover .vb-dash-mini-overlay { background: rgba(0,0,0,0.25); }
 .vb-dash-mini-outer:hover .vb-dash-mini-overlay span { opacity: 1; }
 
-/* ── Save Board & My Boards topbar buttons ── */
 .vb-save-board-btn {
   display: flex; align-items: center; gap: 7px;
   background: linear-gradient(135deg, #059669, #34d399);
@@ -3866,7 +3665,6 @@ body {
 }
 .vb-myboards-btn:hover { background: rgba(167,139,250,0.2); color: #fff; border-color: rgba(167,139,250,0.45); }
 
-/* ── My Boards modal overlay ── */
 .vb-myboards-overlay {
   display: none; position: fixed; inset: 0; z-index: 2000;
   background: rgba(0,0,0,0.65);
@@ -3917,7 +3715,6 @@ body {
 .vb-myboards-body::-webkit-scrollbar { width: 4px; }
 .vb-myboards-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
-/* Empty state */
 .vb-mb-empty {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 10px; padding: 48px 20px; text-align: center;
@@ -3927,7 +3724,6 @@ body {
 .vb-mb-empty-sub  { font-size: 13px; color: rgba(255,255,255,0.3); line-height: 1.5; }
 .vb-mb-empty-sub strong { color: rgba(255,255,255,0.55); }
 
-/* Board grid */
 .vb-mb-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: 14px;
@@ -3978,7 +3774,6 @@ body {
 }
 .vb-mb-btn-del:hover { background: rgba(255,80,80,0.18); color: #ff8080; }
 
-/* ── Toast notification ── */
 .vb-toast {
   position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(12px);
   background: #1e1a30; border: 1px solid rgba(167,139,250,0.3);
@@ -3991,14 +3786,8 @@ body {
 }
 .vb-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ═══════════════════════════════════════════════
-   AUTH — Login / Sign Up
-   ═══════════════════════════════════════════════ */
-
-/* Remove old login card styles that conflict */
 .login-card { display: none !important; }
 
-/* Full-page auth wrapper — centered on the gradient bg */
 .auth-wrapper {
     display: flex;
     align-items: center;
@@ -4007,7 +3796,6 @@ body {
     padding: 40px 16px;
 }
 
-/* The white card */
 .auth-card {
     background: #fff;
     border-radius: 24px;
@@ -4020,7 +3808,6 @@ body {
     gap: 0;
 }
 
-/* Logo row */
 .auth-logo {
     display: flex;
     align-items: center;
@@ -4039,7 +3826,6 @@ body {
     letter-spacing: -0.3px;
 }
 
-/* Tab switcher */
 .auth-tabs {
     display: flex;
     background: #f1f0fb;
@@ -4068,7 +3854,6 @@ body {
 }
 .auth-tab:not(.active):hover { color: #6a5cff; }
 
-/* Form */
 .auth-form { display: flex; flex-direction: column; gap: 14px; }
 
 .auth-field { display: flex; flex-direction: column; gap: 5px; }
@@ -4101,7 +3886,6 @@ body {
 }
 .auth-input::placeholder { color: #bbb; }
 
-/* Password field with eye toggle */
 .auth-pass-wrap {
     position: relative;
     display: flex;
@@ -4124,7 +3908,6 @@ body {
 }
 .auth-eye:hover { color: #6a5cff; }
 
-/* Inline error */
 .auth-err {
     font-size: 11.5px;
     color: transparent;
@@ -4133,7 +3916,6 @@ body {
 }
 .auth-err--show { color: #e53e3e; }
 
-/* Status messages */
 .auth-msg {
     font-size: 13px;
     font-weight: 500;
@@ -4160,7 +3942,6 @@ body {
     border: 1px solid #bfdbfe;
 }
 
-/* Submit button */
 .auth-submit-btn {
     width: 100%;
     padding: 13px;
@@ -4180,7 +3961,6 @@ body {
 .auth-submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 .auth-submit-btn:active { transform: translateY(0); }
 
-/* Back button */
 .auth-back-btn {
     background: none;
     border: none;

@@ -1,13 +1,3 @@
-// =====================================================
-// ORIGINAL CODE — unchanged from logic.js
-// =====================================================
-
-
-// ── Per-user localStorage scoping ────────────────────
-// All user data is stored under a key prefixed by the
-// logged-in user's email so multiple accounts on the
-// same device stay completely separate.
-
 function authCurrentEmail() {
     try {
         var u = JSON.parse(localStorage.getItem('eq_current_user') || 'null');
@@ -19,7 +9,6 @@ function uKey(base) {
     return base + '__' + authCurrentEmail();
 }
 
-// ── Scrolling quotes banner ──────────────────────────
 const bannerQuotes = [
     { text: "The secret of getting ahead is getting started.",                                                          author: "Mark Twain"          },
     { text: "Education is the most powerful weapon which you can use to change the world.",                             author: "Nelson Mandela"      },
@@ -51,7 +40,7 @@ function initBanner() {
         `<span class="banner-sep">✦</span>`
     ).join('');
 
-    // Calculate scroll speed: 90px per second feels natural
+    
     requestAnimationFrame(() => {
         const totalPx  = track.scrollWidth + window.innerWidth;
         const duration = Math.round(totalPx / 90);
@@ -106,7 +95,6 @@ const equilibraFeatures = [
   }
 ];
 
-
 function showPage(pageId) {
     document.querySelectorAll('.page').forEach(page => {
         page.classList.remove('active');
@@ -137,7 +125,7 @@ function showPage(pageId) {
         document.getElementById('mirror-results').style.display = 'none';
         document.getElementById('mirror-form').style.display    = 'block';
         renderMirrorQuestions();
-        // scroll content back to top
+        
         const body = document.querySelector('.mirror-page-body');
         if (body) body.scrollTop = 0;
     }
@@ -150,19 +138,16 @@ function showPage(pageId) {
     }
 
     if (pageId === "vision-board") {
-        // Hide the fixed banner so the vision board topbar is visible
+        
         var banner = document.querySelector('.floating-banner');
         if (banner) banner.style.display = 'none';
         initVisionBoard();
     } else {
-        // Restore banner for all other pages
+        
         var banner = document.querySelector('.floating-banner');
         if (banner) banner.style.display = '';
     }
 }
-
-
-// ── Auth helpers ─────────────────────────────────────
 
 const AUTH_KEY = 'eq_users';
 
@@ -306,7 +291,6 @@ function authSignup() {
 
 function loginUser() { showPage('login'); }
 
-
 function typeWelcomeText() {
     const text = "Welcome to Equilibra";
     const title = document.getElementById("welcome-title");
@@ -325,8 +309,6 @@ function typeWelcomeText() {
     }, 90);
 }
 
-
-// ── DARK MODE ────────────────────────────────────────────────────────────────
 (function() {
     if (localStorage.getItem('eq_dark_mode') === '1') {
         document.body.classList.add('dark');
@@ -415,12 +397,6 @@ function toggleEquilibraCard(selectedCard) {
         }
     });
 }
-
-
-// =====================================================
-// NEW ADDITIONS ONLY — course data + detail page
-// Nothing above was changed.
-// =====================================================
 
 const courses = [
     {
@@ -931,7 +907,6 @@ const courses = [
     }
 ];
 
-// item type → icon color and label
 const itemMeta = {
     assignment: { emoji: "📄", color: "#e84b8a", label: "ASSIGNMENT" },
     quiz:       { emoji: "✅", color: "#e84b8a", label: "QUIZ"       },
@@ -941,8 +916,6 @@ const itemMeta = {
     page:       { emoji: "📄", color: "#1a73e8", label: "PAGE"       },
     folder:     { emoji: "📂", color: "#1a73e8", label: "FOLDER"     }
 };
-
-// ── Progress tracking (localStorage) ────────────────────────────────────────
 
 function loadProgress() {
     try { return JSON.parse(localStorage.getItem(uKey('eq_progress')) || '{}'); }
@@ -971,7 +944,6 @@ function calcCompletion(course) {
     return Math.round((done / trackable.length) * 100);
 }
 
-// ── Inject course cards into the dashboard grid ──────────────────────────────
 function buildCourseCard(course) {
     const pct = calcCompletion(course);
     const card = document.createElement("div");
@@ -1002,7 +974,6 @@ function renderCourseGrid() {
     renderUpcomingDeadlines();
 }
 
-// Track last-accessed timestamps per course
 function recordCourseAccess(courseId) {
     try {
         var map = JSON.parse(localStorage.getItem(uKey('eq_course_access')) || '{}');
@@ -1015,7 +986,6 @@ function getCourseAccessMap() {
     catch(e) { return {}; }
 }
 
-// My Courses filter state
 var currentCourseFilter = 'all';
 
 function goToActiveCourses() {
@@ -1031,7 +1001,6 @@ function setCourseFilter(filter, btn) {
     renderCourseGridIn('course-grid-mycourses', true);
 }
 
-// Open a course detail page
 function openCourse(courseId) {
     const course = courses.find(c => c.id === courseId);
     if (!course) return;
@@ -1061,7 +1030,7 @@ function openCourse(courseId) {
                 const dueHtml  = item.due  ? `<div class="lms-item-due">📅 Due: ${item.due}</div>` : "";
                 const noteHtml = item.note ? `<div class="lms-item-note">${item.note}</div>` : "";
 
-                // Action button — type-aware
+                
                 let actionBtn = "";
                 if (!item.locked) {
                     if (done) {
@@ -1080,7 +1049,7 @@ function openCourse(courseId) {
                             💬 Open
                         </button>`;
                     } else {
-                        // file / page / folder
+                        
                         actionBtn = `<button class="mark-done-btn"
                             data-course="${course.id}" data-label="${item.label.replace(/"/g,'&quot;')}"
                             onclick="quickMarkDone(this)">
@@ -1117,14 +1086,13 @@ function openCourse(courseId) {
         container.appendChild(section);
     });
 
-    // render Equilibra cards in the detail panel
+    
     renderEquilibraCardsIn("#detail-equilibra-cards");
 
-    maybeCelebrate('course');   // Nemo celebration hook
+    maybeCelebrate('course');   
     showPage('course-detail');
 }
 
-// ── Quick mark-done (files / pages / folders) ────────────────────────────────
 function quickMarkDone(btn) {
     const courseId = btn.dataset.course;
     const label    = btn.dataset.label;
@@ -1140,7 +1108,6 @@ function quickMarkDone(btn) {
     refreshCompletionUI(courseId);
 }
 
-// ── Submit modal (assignments / quizzes / VPL) ────────────────────────────────
 function openSubmitModal(btn) {
     const courseId = btn.dataset.course;
     const label    = btn.dataset.label;
@@ -1160,7 +1127,7 @@ function openSubmitModal(btn) {
     confirmBtn.onclick = function() {
         markDone(courseId, label);
         closeSubmitModal();
-        openCourse(courseId);        // re-render the course page to reflect done state
+        openCourse(courseId);        
         refreshCompletionUI(courseId);
     };
 
@@ -1171,7 +1138,6 @@ function closeSubmitModal() {
     document.getElementById('submit-modal-overlay').classList.remove('active');
 }
 
-// ── Forum modal ───────────────────────────────────────────────────────────────
 function openForumModal(btn) {
     const courseId = btn.dataset.course;
     const label    = btn.dataset.label;
@@ -1196,7 +1162,7 @@ function openForumModal(btn) {
             </div>
         </div>`;
 
-    // Mark forum as "read/done"
+    
     markDone(courseId, label);
     refreshCompletionUI(courseId);
 
@@ -1207,12 +1173,11 @@ function closeForumModal() {
     document.getElementById('forum-modal-overlay').classList.remove('active');
 }
 
-// ── Refresh completion bar on course cards without full re-render ─────────────
 function refreshCompletionUI(courseId) {
     const course = courses.find(c => c.id === courseId);
     if (!course) return;
     const pct = calcCompletion(course);
-    // Update all matching cards in both grids
+    
     document.querySelectorAll('.course-card').forEach(card => {
         const h4 = card.querySelector('h4');
         if (h4 && h4.textContent === course.title) {
@@ -1222,17 +1187,16 @@ function refreshCompletionUI(courseId) {
             if (txt) txt.textContent = pct + '% complete';
         }
     });
-    // Also refresh the deadlines widget
+    
     renderUpcomingDeadlines();
 }
 
-// ── Upcoming deadlines ────────────────────────────────────────────────────────
 function parseItemDate(str) {
     if (!str) return null;
-    // Handle "DD-MM-YYYY" format
+    
     const dmyMatch = str.match(/^(\d{1,2})-(\d{1,2})-(\d{4})/);
     if (dmyMatch) return new Date(+dmyMatch[3], +dmyMatch[2]-1, +dmyMatch[1]);
-    // Handle "D Mon YYYY, H:MM AM/PM" or similar
+    
     const d = new Date(str);
     return isNaN(d) ? null : d;
 }
@@ -1289,7 +1253,6 @@ function renderUpcomingDeadlines() {
     }).join('');
 }
 
-// ── Collapse / expand a faculty section ──────────────────────────────────────
 function toggleSection(header) {
     const items  = header.nextElementSibling;
     const toggle = header.querySelector(".faculty-toggle");
@@ -1298,7 +1261,6 @@ function toggleSection(header) {
     toggle.textContent   = isOpen ? "▶" : "▼";
 }
 
-// Render Equilibra cards into any selector (used for detail page panel)
 function renderEquilibraCardsIn(selector) {
     const container = document.querySelector(selector);
     if (!container) return;
@@ -1328,8 +1290,6 @@ function renderEquilibraCardsIn(selector) {
     });
 }
 
-// ── TAB SWITCHING ────────────────────────────────────────────────────────────
-
 function switchTab(viewId) {
     ['dashboard-view','mycourses-view','calendar-view'].forEach(id => {
         const el = document.getElementById(id);
@@ -1346,8 +1306,6 @@ function switchTab(viewId) {
     if (viewId === 'mycourses-view') renderCourseGridIn('course-grid-mycourses', true);
     if (viewId === 'calendar-view')  renderCalendar();
 }
-
-// ── CALENDAR ─────────────────────────────────────────────────────────────────
 
 let calYear  = new Date().getFullYear();
 let calMonth = new Date().getMonth();
@@ -1425,7 +1383,6 @@ function renderCalendar() {
     }
 }
 
-// ── User events (persisted per user) ─────────────────────────────────────────
 function getUserEvents() {
     try { return JSON.parse(localStorage.getItem(uKey('eq_cal_events')) || '{}'); }
     catch(e) { return {}; }
@@ -1438,7 +1395,7 @@ function openNewEventModal() {
     const overlay = document.getElementById('new-event-overlay');
     if (!overlay) return;
     document.getElementById('nev-name').value = '';
-    // Default date = today
+    
     const today = new Date();
     document.getElementById('nev-date').value = today.toISOString().slice(0, 10);
     document.getElementById('nev-err').style.display = 'none';
@@ -1459,7 +1416,7 @@ function saveNewEvent() {
     if (!dateVal) { errEl.textContent = 'Please pick a date.'; errEl.style.display = 'block'; return; }
     errEl.style.display = 'none';
 
-    // Key format: YYYY-M-D (matches calEvents format)
+    
     const [y, m, d] = dateVal.split('-').map(Number);
     const key = y + '-' + m + '-' + d;
 
@@ -1471,10 +1428,6 @@ function saveNewEvent() {
     document.getElementById('new-event-overlay').style.display = 'none';
     renderCalendar();
 }
-
-// ══════════════════════════════════════════════════════════════════════════════
-// RECHARGE — GAMES
-// ══════════════════════════════════════════════════════════════════════════════
 
 let _bubbleRunning = false;
 let _2048KeyHandler = null;
@@ -1502,7 +1455,6 @@ function exitGame() {
     document.getElementById('recharge-picker').style.display = 'block';
 }
 
-// ── BUBBLE POP ────────────────────────────────────────────────────────────────
 function initBubblePop() {
     const container = document.getElementById('game-bubble');
     container.innerHTML = `
@@ -1589,7 +1541,6 @@ function initBubblePop() {
     })();
 }
 
-// ── MEMORY MATCH ─────────────────────────────────────────────────────────────
 function initMemoryMatch() {
     const container = document.getElementById('game-memory');
     const EMOJIS = ['🌸','🦋','🌙','⭐','🌈','🎯','🦊','🐬','🍀','🎨'];
@@ -1654,7 +1605,6 @@ function initMemoryMatch() {
     buildGrid();
 }
 
-// ── 2048 ──────────────────────────────────────────────────────────────────────
 function init2048() {
     const container = document.getElementById('game-2048');
     let board = Array.from({length:4}, () => Array(4).fill(0));
@@ -1758,7 +1708,7 @@ function renderCourseGridIn(gridId, force) {
     var filtered = courses;
 
     if (currentCourseFilter === 'active') {
-        // Recently accessed — sort by last accessed time, show those opened at least once
+        
         const accessed = courses.filter(c => accessMap[c.id]);
         if (accessed.length === 0) {
             grid.innerHTML = '<p style="color:#888;padding:20px 0;grid-column:1/-1;">No recently accessed courses yet. Click any course to open it.</p>';
@@ -1796,14 +1746,9 @@ function renderCourseGridIn(gridId, force) {
     });
 }
 
-
-// ══════════════════════════════════════════════════════════════════════════════
-// STUDENT MIRROR — burnout calculator
-// ══════════════════════════════════════════════════════════════════════════════
-
 const mirrorQuestions = [
 
-    // ── Warm qualitative (choice-based) ────────────────────────────────────
+    
     {
         id: 'q_mornings', type: 'warm', dimension: 'wellbeing',
         text: 'How have your mornings been feeling this week?',
@@ -1835,7 +1780,7 @@ const mirrorQuestions = [
         ]
     },
 
-    // ── Scale 1–10 ──────────────────────────────────────────────────────────
+    
     {
         id: 'q_tired', type: 'scale', dimension: 'exhaustion',
         text: 'How physically tired are you at the end of a study day?',
@@ -1871,8 +1816,6 @@ const mirrorQuestions = [
 let mirrorAnswers    = {};
 let mirrorRadarChart = null;
 
-// ── Open / close ────────────────────────────────────────────────────────────
-
 function openMirrorModal() {
     showPage('mirror');
 }
@@ -1882,7 +1825,7 @@ function closeMirrorModal() {
 }
 
 function closeMirrorModalOutside(e) {
-    // no-op: no overlay anymore, kept for any residual references
+    
 }
 
 function retakeMirror() {
@@ -1892,8 +1835,6 @@ function retakeMirror() {
     renderMirrorQuestions();
     const _mb = document.querySelector('.mirror-page-body'); if (_mb) _mb.scrollTop = 0;
 }
-
-// ── Render questions ─────────────────────────────────────────────────────────
 
 function setSliderGradient(slider) {
     const pct = ((parseFloat(slider.value) - 1) / 9 * 100).toFixed(1);
@@ -1922,7 +1863,7 @@ function renderMirrorQuestions() {
         card.appendChild(qText);
 
         if (q.type === 'warm') {
-            // Choice buttons
+            
             const optWrap = document.createElement('div');
             optWrap.className = 'mirror-options';
 
@@ -1941,7 +1882,7 @@ function renderMirrorQuestions() {
             card.appendChild(optWrap);
 
         } else {
-            // Scale slider
+            
             const scaleWrap = document.createElement('div');
             scaleWrap.className = 'mirror-scale-wrap';
 
@@ -1963,7 +1904,7 @@ function renderMirrorQuestions() {
             valDisplay.className   = 'mirror-slider-val';
             valDisplay.textContent = '5';
 
-            // Set default answer immediately
+            
             mirrorAnswers[q.id] = { score: 5, reversed: !!q.reversed };
             setSliderGradient(slider);
 
@@ -1994,10 +1935,8 @@ function renderMirrorQuestions() {
     });
 }
 
-// ── Calculate & show results ─────────────────────────────────────────────────
-
 function calculateBurnout() {
-    // Validate warm questions
+    
     for (const q of mirrorQuestions.filter(q => q.type === 'warm')) {
         if (!mirrorAnswers[q.id]) {
             const card = document.getElementById('mq-' + q.id);
@@ -2010,14 +1949,14 @@ function calculateBurnout() {
         }
     }
 
-    // Convert raw answer → burnout value (0–100, higher = more burned out)
+    
     function toBurnout(raw, reversed) {
         return reversed
-            ? ((11 - raw) / 9) * 100   // high raw = low burnout → flip
+            ? ((11 - raw) / 9) * 100   
             : ((raw  - 1) / 9) * 100;
     }
 
-    // Collect by dimension
+    
     const buckets = { exhaustion: [], pressure: [], focus: [], wellbeing: [], engagement: [] };
     mirrorQuestions.forEach(q => {
         const ans = mirrorAnswers[q.id];
@@ -2025,7 +1964,7 @@ function calculateBurnout() {
         buckets[q.dimension].push(toBurnout(ans.score, ans.reversed));
     });
 
-    // Average each dimension → round
+    
     const dims = {};
     Object.keys(buckets).forEach(k => {
         const arr = buckets[k];
@@ -2034,7 +1973,7 @@ function calculateBurnout() {
             : 50;
     });
 
-    // Overall (equal weights)
+    
     const overall = Math.round(
         (dims.exhaustion + dims.pressure + dims.focus + dims.wellbeing + dims.engagement) / 5
     );
@@ -2047,7 +1986,7 @@ function showMirrorResults(overall, dims) {
     document.getElementById('mirror-results').style.display = 'block';
     const _mb = document.querySelector('.mirror-page-body'); if (_mb) _mb.scrollTop = 0;
 
-    // ── Animated counter ──
+    
     const numEl = document.getElementById('burnout-score-num');
     let current = 0;
     numEl.textContent = '0';
@@ -2058,7 +1997,7 @@ function showMirrorResults(overall, dims) {
         if (current >= overall) clearInterval(counter);
     }, 28);
 
-    // ── Ring ──
+    
     const ring          = document.getElementById('ring-fill-circle');
     const circumference = 314.16;
     const offset        = circumference - (overall / 100) * circumference;
@@ -2071,12 +2010,12 @@ function showMirrorResults(overall, dims) {
     else                    ringColor = '#e84b8a';
 
     ring.style.stroke = ringColor;
-    // Kick animation on next frame so transition triggers
+    
     requestAnimationFrame(() => {
         ring.style.strokeDashoffset = offset;
     });
 
-    // ── Badge + message ──
+    
     const levels = [
         { max: 25, label: '🌿 You\'re doing well',          msg: 'Your energy and engagement look healthy right now. Notice what\'s working for you and keep honouring it.' },
         { max: 45, label: '🌤  Mild strain',                 msg: 'There are small signs of stress — completely normal. Be gentle with yourself this week, and let the little things go.' },
@@ -2091,7 +2030,7 @@ function showMirrorResults(overall, dims) {
     badge.style.background   = ringColor;
     document.getElementById('burnout-message').textContent = level.msg;
 
-    // ── Dimension bars ──
+    
     const dimLabels = {
         exhaustion: '🔋 Exhaustion',
         pressure:   '📚 Academic Pressure',
@@ -2119,14 +2058,14 @@ function showMirrorResults(overall, dims) {
         dimsEl.appendChild(row);
     });
 
-    // Animate bars after a brief pause
+    
     setTimeout(() => {
         document.querySelectorAll('.dim-bar').forEach(bar => {
             bar.style.width = bar.dataset.w;
         });
     }, 180);
 
-    // ── Radar chart ──
+    
     renderBurnoutRadar(dims);
 }
 
@@ -2180,11 +2119,6 @@ function renderBurnoutRadar(dims) {
     });
 }
 
-
-// ══════════════════════════════════════════════════════════════════════════════
-// NEMO MOOD BUDDY
-// ══════════════════════════════════════════════════════════════════════════════
-
 let nemoStartTime   = Date.now();
 let nemoLastNudge   = 0;
 let breathInterval  = null;
@@ -2194,13 +2128,11 @@ let lastTalkRespIdx = -1;
 let lastCelebIdx    = -1;
 const BREATHE_ROUNDS = 3;
 
-// ── Open / close ──────────────────────────────────────────────────────────────
-
 function openNemo() {
     document.getElementById('nemo-modal-overlay').classList.add('active');
     document.body.style.overflow = 'hidden';
     setNemoGreeting();
-    nemoChatSessionActive = false;   // allow chat to re-initialise for this session
+    nemoChatSessionActive = false;   
     switchNemoScreen('mood');
     document.querySelectorAll('.nemo-mood-btn').forEach(b => b.classList.remove('selected'));
     document.getElementById('nemo-mood-response').style.display = 'none';
@@ -2217,8 +2149,6 @@ function closeNemoOutside(e) {
     if (e.target === document.getElementById('nemo-modal-overlay')) closeNemo();
 }
 
-// ── Time-aware greeting ───────────────────────────────────────────────────────
-
 function setNemoGreeting() {
     const h = new Date().getHours();
     const pool =
@@ -2234,8 +2164,6 @@ function setNemoGreeting() {
         pool[Math.floor(Math.random() * pool.length)];
 }
 
-// ── Screen switching ──────────────────────────────────────────────────────────
-
 function switchNemoScreen(screen) {
     ['mood', 'talk', 'breathe'].forEach(s => {
         document.getElementById('nemo-' + s + '-screen').style.display =
@@ -2244,19 +2172,15 @@ function switchNemoScreen(screen) {
         if (tab) tab.classList.toggle('active', s === screen);
     });
     if (screen !== 'breathe') stopBreathing();
-    // Only initialise chat once per Nemo open; switching back does NOT reset it
+    
     if (screen === 'talk' && !nemoChatSessionActive) resetNemoChat();
 }
-
-// ── Panda expression ──────────────────────────────────────────────────────────
 
 function setNemoPanda(mood) {
     const p = document.getElementById('nemo-panda');
     if (!p) return;
     p.className = 'nemo-panda' + (mood !== 'default' ? ' panda-' + mood : '');
 }
-
-// ── Mood Pulse ────────────────────────────────────────────────────────────────
 
 const moodResponses = {
     great: [
@@ -2296,12 +2220,10 @@ function selectMood(mood) {
     setNemoPanda(mood);
 }
 
-// ── Chat Therapist (Groq AI — Llama 3) ───────────────────────────────────────
-
 let nemoChatReady         = false;
 let nemoChatSessionActive = false;
 let nemoApiKey            = localStorage.getItem(uKey('nemo_groq_key')) || '';
-let nemoChatHistory       = [];   // [{role:'user'|'assistant', content:'...'}]
+let nemoChatHistory       = [];   
 
 const NEMO_SYSTEM_PROMPT =
 `You are Nemo, a warm, emotionally intelligent mental health support companion inside a student wellness app called Equilibra. You offer compassionate, peer-style support — not professional therapy.
@@ -2323,7 +2245,6 @@ Core approach for mental health conversations:
 - You're a panda mascot — a 🐼 or 🌿 emoji here and there is fine, but don't overdo it.
 - You are particularly attuned to: academic stress, burnout, loneliness, anxiety, self-worth, family pressure, relationships, grief, identity, and future uncertainty.`;
 
-// Shown when no API key is set — genuine but not AI
 const nemoBasicResponses = [
     "That sounds really heavy to be carrying. Can you tell me a bit more about what's been going on?",
     "I hear you. What part of this is weighing on you the most right now?",
@@ -2406,7 +2327,7 @@ function nemoSetApiKey() {
     var input = document.getElementById('nemo-key-input');
     if (!input || !input.value.trim()) return;
     nemoApiKey = input.value.trim();
-    localStorage.setItem(uKey('nemo_groq_key'), nemoApiKey);   // persist across sessions
+    localStorage.setItem(uKey('nemo_groq_key'), nemoApiKey);   
     var history = document.getElementById('nemo-chat-history');
     if (history) history.innerHTML = '';
     nemoChatHistory = [];
@@ -2421,7 +2342,7 @@ function nemoSetApiKey() {
 function nemoForgetApiKey() {
     nemoApiKey = '';
     localStorage.removeItem(uKey('nemo_groq_key'));
-    nemoInitChat();   // re-show the setup card so user can enter a new key
+    nemoInitChat();   
 }
 
 function nemoShowKeyStatus() {
@@ -2494,7 +2415,7 @@ function resetNemoChat() {
     if (!history) return;
     history.innerHTML = '';
 
-    // Show API key setup card (or skip straight in if key already saved)
+    
     if (nemoApiKey) {
         nemoChatAppend('nemo', "Hey \u2014 I\u2019m Nemo. What\u2019s on your mind today? \uD83D\uDC3C");
         nemoShowKeyStatus();
@@ -2531,8 +2452,6 @@ function resetNemoChat() {
         nemoChatReady = true;
     }
 }
-
-// ── Breathing ─────────────────────────────────────────────────────────────────
 
 const breathPhases = [
     { label: 'Breathe in',  counts: 4, ms: 1000 },
@@ -2594,8 +2513,6 @@ function stopBreathing(completed) {
     if (countEl)  countEl.textContent    = '';
 }
 
-// ── Stress nudges ─────────────────────────────────────────────────────────────
-
 const nudgeMessages = [
     "Hey, you've been at this for a while. A 5-minute break might actually help you focus more 🍵",
     "It's getting late. Even a short rest does more than you'd think 🌙",
@@ -2646,8 +2563,6 @@ function dismissNudge() {
 
 setInterval(checkNudgeConditions, 60000);
 
-// ── Celebration toasts ────────────────────────────────────────────────────────
-
 const celebrationMessages = [
     "You showed up today. That counts for a lot 🐼",
     "One more thing done. You're moving forward ✨",
@@ -2683,16 +2598,10 @@ function showCelebToast(msg) {
     }, 3500);
 }
 
-// Hook: mark-done-btn clicks trigger celebration
 document.addEventListener('click', e => {
     if (e.target.classList.contains('mark-done-btn')) maybeCelebrate('done');
 });
 
-// ═══════════════════════════════════════════════════════════════════════════
-// UNLOAD WALL
-// ═══════════════════════════════════════════════════════════════════════════
-
-// ── State ─────────────────────────────────────────────────────────────────
 var unloadCurrentMode  = 'draw';
 var unloadDrawColor    = '#1a1a2e';
 var unloadBrushSize    = 4;
@@ -2700,11 +2609,10 @@ var unloadEraserActive = false;
 var unloadIsDrawing    = false;
 var unloadLastX        = 0;
 var unloadLastY        = 0;
-var unloadAnimRAF      = null;   // active rAF handle (tear or burn)
-var unloadPieceLayer   = null;   // overlay canvas holding scattered pieces
-var unloadPieces       = [];     // piece objects
+var unloadAnimRAF      = null;   
+var unloadPieceLayer   = null;   
+var unloadPieces       = [];     
 
-// ── Open / close ──────────────────────────────────────────────────────────
 function openUnloadWall() {
     showPage('unload');
 }
@@ -2717,7 +2625,7 @@ function closeUnloadWall() {
 }
 
 function closeUnloadOutside(e) {
-    // no-op: no overlay anymore, kept for any residual references
+    
 }
 
 function resetUnloadWall() {
@@ -2743,7 +2651,6 @@ function resetUnloadWall() {
     switchUnloadMode(unloadCurrentMode);
 }
 
-// ── Mode switch ───────────────────────────────────────────────────────────
 function switchUnloadMode(mode) {
     unloadCurrentMode = mode;
     document.querySelectorAll('.unload-mode-btn').forEach(function(b) {
@@ -2754,7 +2661,6 @@ function switchUnloadMode(mode) {
     if (mode === 'draw') requestAnimationFrame(function() { requestAnimationFrame(initUnloadCanvas); });
 }
 
-// ── Canvas setup & drawing ─────────────────────────────────────────────────
 function initUnloadCanvas() {
     var canvas = document.getElementById('unload-canvas');
     var wrap   = document.getElementById('unload-canvas-wrap');
@@ -2774,7 +2680,7 @@ function initUnloadCanvas() {
 }
 
 function attachUnloadCanvasEvents(canvas) {
-    // Remove old listeners by replacing the element's event handlers via a flag
+    
     if (canvas._unloadEventsAttached) return;
     canvas._unloadEventsAttached = true;
 
@@ -2821,7 +2727,6 @@ function attachUnloadCanvasEvents(canvas) {
     canvas.addEventListener('touchend',     stopDraw);
 }
 
-// Color & size tool handlers
 document.addEventListener('click', function(e) {
     var swatch = e.target.closest('.unload-color-swatch');
     if (swatch) {
@@ -2853,7 +2758,6 @@ function clearUnloadCanvas() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────
 function unloadRenderText(text, w, h) {
     var c = document.createElement('canvas');
     c.width = w; c.height = h;
@@ -2892,7 +2796,6 @@ function unloadJagPath(ctx, pts) {
     ctx.closePath();
 }
 
-// ── Sounds ─────────────────────────────────────────────────────────────────
 function playTearSound() {
     try {
         var ac  = new (window.AudioContext || window.webkitAudioContext)();
@@ -2900,7 +2803,7 @@ function playTearSound() {
         var len = Math.floor(sr * 0.38);
         var buf = ac.createBuffer(1, len, sr);
         var d   = buf.getChannelData(0);
-        // Noise with ripping modulation: irregular amplitude bumps = characteristic rip texture
+        
         for (var i = 0; i < len; i++) {
             var t   = i / sr;
             var env = Math.exp(-t * 7) * Math.min(t * 320, 1);
@@ -2912,7 +2815,7 @@ function playTearSound() {
         var g   = ac.createGain();         g.gain.value = 1.4;
         var src = ac.createBufferSource(); src.buffer = buf;
         src.connect(hpf); hpf.connect(pk); pk.connect(g); g.connect(ac.destination);
-        // Resume is required in Chrome — AudioContext starts suspended
+        
         ac.resume().then(function() { src.start(); });
         setTimeout(function() { try { ac.close(); } catch(x) {} }, 700);
     } catch(e) {}
@@ -2921,12 +2824,12 @@ function playTearSound() {
 function playCrackleSound() {
     try {
         var ac  = new (window.AudioContext || window.webkitAudioContext)();
-        ac.resume();   // ensure context is running (Chrome auto-suspends)
+        ac.resume();   
         var sr  = ac.sampleRate;
         var dur = 2.8;
         var now = ac.currentTime;
 
-        // 1 — continuous background fire hiss
+        
         var hLen  = Math.floor(sr * dur);
         var hBuf  = ac.createBuffer(1, hLen, sr);
         var hD    = hBuf.getChannelData(0);
@@ -2941,7 +2844,7 @@ function playCrackleSound() {
         hSrc.connect(hBPF); hBPF.connect(hLPF); hLPF.connect(hG); hG.connect(ac.destination);
         hSrc.start(now);
 
-        // 2 — pre-scheduled crackle pops (varied size, frequency, timing = realistic fire)
+        
         for (var p = 0; p < 40; p++) {
             var pt   = 0.07 + Math.random() * dur * 0.88;
             var pLen = Math.floor(sr * (0.011 + Math.random() * 0.03));
@@ -2956,7 +2859,7 @@ function playCrackleSound() {
             pSrc.start(now + pt);
         }
 
-        // 3 — low-frequency fire rumble
+        
         var rOsc = ac.createOscillator(); rOsc.type = 'sawtooth'; rOsc.frequency.value = 52;
         var rLPF = ac.createBiquadFilter(); rLPF.type = 'lowpass'; rLPF.frequency.value = 170;
         var rG   = ac.createGain();
@@ -2971,7 +2874,6 @@ function playCrackleSound() {
     } catch(e) {}
 }
 
-// ── Tear — many jagged pieces scatter outward ──────────────────────────────
 function unloadTear() {
     playTearSound();
 
@@ -2986,14 +2888,14 @@ function unloadTear() {
     var srcW  = Math.round(cRect.width);
     var srcH  = Math.round(cRect.height);
 
-    // Snapshot source into a canvas
+    
     var srcCanvas = unloadCurrentMode === 'draw'
         ? document.getElementById('unload-canvas')
         : unloadRenderText(document.getElementById('unload-textarea').value || '', srcW, srcH);
 
     contentEl.style.visibility = 'hidden';
 
-    // Overlay canvas (full modal)
+    
     unloadPieceLayer = document.createElement('canvas');
     unloadPieceLayer.width  = Math.round(mRect.width);
     unloadPieceLayer.height = Math.round(mRect.height);
@@ -3016,10 +2918,10 @@ function unloadTear() {
             pc.height = Math.round(pH + mg * 2);
             var pctx = pc.getContext('2d');
 
-            // Generate jagged torn-paper border
+            
             var pts = unloadGenJaggedPts(mg, mg, pW, pH, NOISE);
 
-            // Clip to jagged shape, fill paper colour, draw source image
+            
             pctx.save();
             unloadJagPath(pctx, pts);
             pctx.clip();
@@ -3028,7 +2930,7 @@ function unloadTear() {
             pctx.drawImage(srcCanvas, -sx + mg, -sy + mg, srcW, srcH);
             pctx.restore();
 
-            // Torn-edge line
+            
             pctx.save();
             unloadJagPath(pctx, pts);
             pctx.strokeStyle = 'rgba(0,0,0,0.16)';
@@ -3091,7 +2993,6 @@ function unloadTear() {
     unloadAnimRAF = requestAnimationFrame(animateScatter);
 }
 
-// ── Burn — fire sweeps through scattered pieces ────────────────────────────
 function unloadBurn() {
     if (!unloadPieceLayer) { resetUnloadAfterRelease(); return; }
     playCrackleSound();
@@ -3101,7 +3002,7 @@ function unloadBurn() {
     var ctx      = unloadPieceLayer.getContext('2d');
     var startT   = Date.now();
     var BURN_DUR = 2600;
-    var fP       = [];   // fire particles
+    var fP       = [];   
 
     function spawnFire(sweepY) {
         for (var i = 0; i < 11; i++) {
@@ -3121,13 +3022,13 @@ function unloadBurn() {
     function burnFrame() {
         var elapsed  = Date.now() - startT;
         var progress = Math.min(elapsed / BURN_DUR, 1);
-        var sweepY   = lH * (1 - progress * 1.18);   // sweep line bottom→top
+        var sweepY   = lH * (1 - progress * 1.18);   
 
         ctx.clearRect(0, 0, lW, lH);
 
-        // Redraw pieces — alpha falls as sweep line passes them
+        
         unloadPieces.forEach(function(p) {
-            var dist  = p.y - sweepY;          // positive = above (not yet burned)
+            var dist  = p.y - sweepY;          
             var alpha = dist > 80 ? 1 : dist > -35 ? Math.max(0, (dist + 35) / 115) : 0;
             if (alpha <= 0) return;
 
@@ -3138,7 +3039,7 @@ function unloadBurn() {
             ctx.shadowColor = 'rgba(0,0,0,0.18)'; ctx.shadowBlur = 7;
             ctx.drawImage(p.canvas, -p.canvas.width / 2, -p.canvas.height / 2);
 
-            // Orange char glow as fire approaches
+            
             if (alpha < 0.85) {
                 ctx.globalAlpha = (0.85 - alpha) * 1.4;
                 var grd = ctx.createRadialGradient(0, 0, 0, 0, 0, p.canvas.width * 0.6);
@@ -3151,10 +3052,10 @@ function unloadBurn() {
             ctx.restore();
         });
 
-        // Spawn fire along sweep line
+        
         if (progress < 0.93) spawnFire(sweepY);
 
-        // Draw & update fire particles
+        
         for (var i = fP.length - 1; i >= 0; i--) {
             var fp = fP[i];
             fp.x   += fp.vx + (Math.random() - 0.5) * 0.7;
@@ -3190,24 +3091,24 @@ function resetUnloadAfterRelease() {
     if (unloadPieceLayer) { unloadPieceLayer.remove(); unloadPieceLayer = null; }
     unloadPieces = [];
 
-    // Restore content areas
+    
     var cw = document.getElementById('unload-canvas-wrap');
     var ts = document.getElementById('unload-type-screen');
     if (cw) cw.style.visibility = '';
     if (ts) ts.style.visibility = '';
 
-    // Clear content
+    
     var ta = document.getElementById('unload-textarea');
     if (ta) ta.value = '';
     clearUnloadCanvas();
 
-    // Reset buttons
+    
     document.getElementById('unload-tear-btn').style.display = 'inline-flex';
     document.getElementById('unload-burn-btn').style.display = 'none';
     var hint = document.getElementById('unload-release-hint');
     if (hint) hint.textContent = 'Ready to let go?';
 
-    // Show "Gone. You're lighter now." popup for 3 seconds
+    
     var popup = document.getElementById('unload-gone-popup');
     if (popup) {
         popup.style.display = 'flex';
@@ -3223,13 +3124,6 @@ function resetUnloadAfterRelease() {
     }
 }
 
-
-
-
-// =====================================================
-// VISION BOARD v2  —  Kittl-inspired editor
-// =====================================================
-
 const VB = {
   CANVAS_W: 900,
   CANVAS_H: 560,
@@ -3242,8 +3136,6 @@ const VB = {
   scale: 1,
   currentPanel: 'backgrounds',
 };
-
-// ── Static data ──────────────────────────────────────
 
 const vbBgs = [
   { type:'solid',    value:'#ffffff',   label:'White'       },
@@ -3310,8 +3202,6 @@ const vbFontOptions = [
   { label:'Arial',            value:'Arial,sans-serif'             },
 ];
 
-// ── Init ─────────────────────────────────────────────
-
 function initVisionBoard() {
   vbLoadState();
   vbApplyBackground();
@@ -3324,14 +3214,14 @@ function initVisionBoard() {
   window.removeEventListener('resize', vbUpdateScale);
   window.addEventListener('resize', vbUpdateScale);
 
-  // Keyboard shortcuts
+  
   document.removeEventListener('keydown', vbKeyHandler);
   document.addEventListener('keydown', vbKeyHandler);
 }
 
 function vbKeyHandler(e) {
   if (!document.getElementById('vision-board').classList.contains('active')) return;
-  // Ignore if editing text
+  
   const active = document.activeElement;
   if (active && active.isContentEditable) return;
 
@@ -3369,8 +3259,6 @@ function vbUpdateScale() {
   VB.scale = sc;
   outer.style.transform = 'scale(' + sc + ')';
 }
-
-// ── Panel switching ───────────────────────────────────
 
 function vbSwitchPanel(name, btn) {
   VB.currentPanel = name;
@@ -3458,7 +3346,7 @@ function vbShapesPanelHTML() {
 function vbBuildPhotosPanel(ct) {
   ct.innerHTML = '<div class="vb-panel-heading">Photos</div>';
 
-  // ── Pinterest button
+  
   var pinterestBtn = document.createElement('button');
   pinterestBtn.className = 'vb-pinterest-btn';
   pinterestBtn.innerHTML =
@@ -3466,13 +3354,13 @@ function vbBuildPhotosPanel(ct) {
     'Search on Pinterest';
   pinterestBtn.addEventListener('click', function() {
     window.open('https://www.pinterest.com/search/pins/?q=vision+board+aesthetic', '_blank', 'noopener');
-    // Show the URL paste row
+    
     urlRow.style.display = 'block';
     urlNote.style.display = 'block';
   });
   ct.appendChild(pinterestBtn);
 
-  // ── "How to" note (hidden until Pinterest is clicked)
+  
   var urlNote = document.createElement('div');
   urlNote.className = 'vb-pinterest-note';
   urlNote.style.display = 'none';
@@ -3482,7 +3370,7 @@ function vbBuildPhotosPanel(ct) {
     '<span class="vb-note-step">3.</span> Paste the URL below';
   ct.appendChild(urlNote);
 
-  // ── URL paste row (hidden until Pinterest is clicked)
+  
   var urlRow = document.createElement('div');
   urlRow.className = 'vb-url-row';
   urlRow.style.display = 'none';
@@ -3507,13 +3395,13 @@ function vbBuildPhotosPanel(ct) {
   urlRow.appendChild(urlBtn);
   ct.appendChild(urlRow);
 
-  // ── Divider
+  
   var div = document.createElement('div');
   div.className = 'vb-photos-or';
   div.innerHTML = '<span>or upload from device</span>';
   ct.appendChild(div);
 
-  // ── Upload zone
+  
   var zone = document.createElement('div');
   zone.className = 'vb-upload-zone';
   zone.innerHTML = '<div class="vb-upload-icon">📷</div><div class="vb-upload-text">Click to upload</div><div class="vb-upload-sub">PNG, JPG, GIF, WebP</div>';
@@ -3548,8 +3436,6 @@ function vbAddImageFromUrl(url) {
   vbPushHistory(); vbSaveState();
 }
 
-// ── Background ───────────────────────────────────────
-
 function vbSetBg(i) {
   VB.background = vbBgs[i];
   vbApplyBackground();
@@ -3568,8 +3454,6 @@ function vbApplyBackground() {
   if (!c) return;
   c.style.background = VB.background.value;
 }
-
-// ── Add items ────────────────────────────────────────
 
 function vbAddText(idx) {
   var p = vbTextPresets[idx];
@@ -3640,8 +3524,6 @@ function vbLoadImageFile(file) {
   };
   reader.readAsDataURL(file);
 }
-
-// ── Render ───────────────────────────────────────────
 
 function vbRenderAll() {
   var canvas = document.getElementById('vb-canvas');
@@ -3727,8 +3609,6 @@ function vbRenderItem(item) {
   canvas.insertBefore(el, selBox);
 }
 
-// ── Selection ────────────────────────────────────────
-
 function vbSelect(id) {
   VB.selectedId = id;
   var item = VB.items.find(function(i) { return i.id === id; });
@@ -3773,8 +3653,6 @@ function vbClickCanvas(e) {
   }
 }
 
-// ── Drag ─────────────────────────────────────────────
-
 function vbStartDrag(e, id) {
   e.preventDefault();
   var item = VB.items.find(function(i) { return i.id === id; });
@@ -3798,8 +3676,6 @@ function vbStartDrag(e, id) {
   document.addEventListener('mousemove', onMove);
   document.addEventListener('mouseup', onUp);
 }
-
-// ── Resize ───────────────────────────────────────────
 
 function vbStartResize(e, handle) {
   e.preventDefault();
@@ -3827,7 +3703,7 @@ function vbStartResize(e, handle) {
       el.style.width  = item.w + 'px'; el.style.height = item.h + 'px';
     }
     vbUpdateSelBox(item);
-    // live update props size display
+    
     var sw = document.getElementById('vb-prop-w');
     var sh = document.getElementById('vb-prop-h');
     if (sw) sw.textContent = Math.round(item.w);
@@ -3841,8 +3717,6 @@ function vbStartResize(e, handle) {
   document.addEventListener('mousemove', onMove);
   document.addEventListener('mouseup', onUp);
 }
-
-// ── Rotate ───────────────────────────────────────────
 
 function vbStartRotate(e) {
   e.preventDefault();
@@ -3859,7 +3733,7 @@ function vbStartRotate(e) {
 
   function onMove(ev) {
     var angle = Math.atan2(ev.clientY - cy, ev.clientX - cx) * 180 / Math.PI + 90;
-    // Snap to 15° increments when Shift held
+    
     if (ev.shiftKey) angle = Math.round(angle / 15) * 15;
     item.rotate = Math.round(angle);
     var el = document.querySelector('#vb-canvas [data-id="' + id + '"]');
@@ -3876,8 +3750,6 @@ function vbStartRotate(e) {
   document.addEventListener('mousemove', onMove);
   document.addEventListener('mouseup', onUp);
 }
-
-// ── Text editing ─────────────────────────────────────
 
 function vbEditText(id, el) {
   var item = VB.items.find(function(i) { return i.id === id; });
@@ -3904,8 +3776,6 @@ function vbEditText(id, el) {
   el.addEventListener('keydown', onKey);
 }
 
-// ── Properties panel ─────────────────────────────────
-
 function vbRenderProps(item) {
   var ph  = document.getElementById('vb-props-placeholder');
   var inn = document.getElementById('vb-props-inner');
@@ -3914,7 +3784,7 @@ function vbRenderProps(item) {
   inn.style.display = 'block';
   inn.innerHTML     = '';
 
-  // ── Common: actions row
+  
   var actions = document.createElement('div');
   actions.className = 'vb-prop-actions';
 
@@ -3924,7 +3794,7 @@ function vbRenderProps(item) {
   actions.appendChild(delBtn);
   inn.appendChild(actions);
 
-  // ── Size display
+  
   var sizeDiv = document.createElement('div');
   sizeDiv.className = 'vb-prop-section';
   sizeDiv.innerHTML = '<div class="vb-prop-label-row"><span class="vb-prop-sec-label">Size &amp; Position</span></div>' +
@@ -3932,7 +3802,7 @@ function vbRenderProps(item) {
     '<div class="vb-wh-box"><span class="vb-wh-letter">H</span><span id="vb-prop-h" class="vb-wh-val">' + Math.round(item.h) + '</span></div></div>';
   inn.appendChild(sizeDiv);
 
-  // Rotation
+  
   inn.appendChild(_vbPropRow('Rotate', _vbNumberInput('vb-prop-rotate', item.rotate || 0, -360, 360, function(val) {
     item.rotate = val;
     var el = document.querySelector('#vb-canvas [data-id="' + item.id + '"]');
@@ -3940,7 +3810,7 @@ function vbRenderProps(item) {
     vbUpdateSelBox(item); vbSaveState();
   }), '°'));
 
-  // Opacity
+  
   inn.appendChild(_vbSliderRow('Opacity', item.opacity !== undefined ? Math.round(item.opacity * 100) : 100, 0, 100, '%', function(val) {
     item.opacity = val / 100;
     var el = document.querySelector('#vb-canvas [data-id="' + item.id + '"]');
@@ -3948,7 +3818,7 @@ function vbRenderProps(item) {
     vbSaveState();
   }));
 
-  // Layer
+  
   var layerDiv = document.createElement('div');
   layerDiv.className = 'vb-prop-layer-row';
   var fwdBtn = _vbBtn('↑ Forward', 'vb-layer-btn', vbLayerUp);
@@ -3957,7 +3827,7 @@ function vbRenderProps(item) {
   layerDiv.appendChild(bckBtn);
   inn.appendChild(layerDiv);
 
-  // ── Type-specific
+  
   var sep = document.createElement('div');
   sep.className = 'vb-prop-sep';
   inn.appendChild(sep);
@@ -3969,7 +3839,7 @@ function vbRenderProps(item) {
 }
 
 function vbTextPropsUI(ct, item) {
-  // Font family
+  
   var fontSel = document.createElement('select');
   fontSel.className = 'vb-prop-select';
   vbFontOptions.forEach(function(f) {
@@ -3985,14 +3855,14 @@ function vbTextPropsUI(ct, item) {
   });
   ct.appendChild(_vbPropRow('Font', fontSel));
 
-  // Font size
+  
   ct.appendChild(_vbSliderRow('Size', item.fontSize, 8, 120, 'px', function(val) {
     item.fontSize = val;
     _vbApplyStyle(item.id, 'fontSize', val + 'px');
     vbSaveState();
   }));
 
-  // Style buttons
+  
   var styleRow = document.createElement('div');
   styleRow.className = 'vb-prop-row';
   var sl = document.createElement('span');
@@ -4026,7 +3896,7 @@ function vbTextPropsUI(ct, item) {
   uBtn.querySelector('b').style.textDecoration = 'underline';
   styleBtns.appendChild(uBtn);
 
-  // Align buttons
+  
   [['L','left'],['C','center'],['R','right']].forEach(function(pair) {
     var btn = document.createElement('button');
     btn.className = 'vb-style-btn' + (item.textAlign === pair[1] ? ' active' : '');
@@ -4046,14 +3916,14 @@ function vbTextPropsUI(ct, item) {
   styleRow.appendChild(styleBtns);
   ct.appendChild(styleRow);
 
-  // Colors
+  
   ct.appendChild(_vbColorRow('Text Color', item.color || '#1a1a2e', function(val) {
     item.color = val;
     _vbApplyStyle(item.id, 'color', val);
     vbSaveState();
   }));
 
-  // Card background
+  
   var bgRow = document.createElement('div');
   bgRow.className = 'vb-prop-row';
   var bgl = document.createElement('span'); bgl.className = 'vb-prop-label'; bgl.textContent = 'Card BG';
@@ -4087,7 +3957,7 @@ function vbTextPropsUI(ct, item) {
   bgRow.appendChild(bgl); bgRow.appendChild(bgWrap);
   ct.appendChild(bgRow);
 
-  // Border radius
+  
   ct.appendChild(_vbSliderRow('Radius', item.borderRadius || 0, 0, 48, 'px', function(val) {
     item.borderRadius = val;
     _vbApplyStyle(item.id, 'borderRadius', val + 'px');
@@ -4121,7 +3991,7 @@ function vbShapePropsUI(ct, item) {
 }
 
 function vbImagePropsUI(ct, item) {
-  // Crop modes
+  
   var cropRow = document.createElement('div');
   cropRow.className = 'vb-prop-row';
   var cl = document.createElement('span'); cl.className = 'vb-prop-label'; cl.textContent = 'Fit';
@@ -4143,8 +4013,6 @@ function vbImagePropsUI(ct, item) {
   cropRow.appendChild(cl); cropRow.appendChild(cropBtns);
   ct.appendChild(cropRow);
 }
-
-// ── Prop helpers ──────────────────────────────────────
 
 function _vbBtn(text, cls, fn) {
   var btn = document.createElement('button');
@@ -4228,8 +4096,6 @@ function _vbApplyStyle(id, prop, value) {
   if (el) el.style[prop] = value;
 }
 
-// ── Item actions ──────────────────────────────────────
-
 function vbDeleteSelected() {
   if (!VB.selectedId) return;
   VB.items = VB.items.filter(function(i) { return i.id !== VB.selectedId; });
@@ -4276,8 +4142,6 @@ function vbLayerDown() {
   vbSaveState();
 }
 
-// ── Undo / Redo ──────────────────────────────────────
-
 function vbPushHistory() {
   VB.history = VB.history.slice(0, VB.histIdx + 1);
   VB.history.push(JSON.stringify({ items: VB.items, background: VB.background, topZ: VB.topZ }));
@@ -4313,8 +4177,6 @@ function vbUpdateHistoryBtns() {
   if (r) r.disabled = VB.histIdx >= VB.history.length - 1;
 }
 
-// ── Save / Load ───────────────────────────────────────
-
 function vbSaveState() {
   try {
     localStorage.setItem(uKey('eq_visionboard'), JSON.stringify({
@@ -4336,8 +4198,6 @@ function vbLoadState() {
   } catch(e) { VB.items = []; }
 }
 
-// ── Download ─────────────────────────────────────────
-
 function vbDownload() {
   vbDeselect();
   var canvas = document.getElementById('vb-canvas');
@@ -4356,8 +4216,6 @@ function vbDownload() {
   }
 }
 
-// ── Clear & Close ─────────────────────────────────────
-
 function vbClearBoard() {
   if (!confirm('Clear the entire vision board? This cannot be undone.')) return;
   VB.items = []; VB.topZ = 10;
@@ -4369,14 +4227,6 @@ function closeVisionBoard() {
   vbDeselect();
   showPage('dashboard');
 }
-
-// ── Dashboard mini-preview ────────────────────────────
-
-
-
-// ── Saved Boards ─────────────────────────────────────
-// Each saved board: { id, name, savedAt, items, background, topZ, thumbnail }
-// Stored as array in localStorage key 'eq_saved_boards'
 
 function vbGetSavedBoards() {
   try {
@@ -4394,12 +4244,12 @@ function vbSaveBoard() {
     return;
   }
 
-  // Prompt for a name
+  
   var name = prompt('Name this board:', 'My Board ' + (vbGetSavedBoards().length + 1));
-  if (name === null) return; // cancelled
+  if (name === null) return; 
   name = name.trim() || ('My Board ' + (vbGetSavedBoards().length + 1));
 
-  // Build a tiny thumbnail data-url from the canvas via html2canvas (if available)
+  
   vbDeselect();
 
   function persist(thumb) {
@@ -4456,7 +4306,7 @@ function vbRenderMyBoards() {
     return;
   }
 
-  // Sort newest first
+  
   boards = boards.slice().sort(function(a, b) { return b.savedAt - a.savedAt; });
 
   var grid = document.createElement('div');
@@ -4466,7 +4316,7 @@ function vbRenderMyBoards() {
     var card = document.createElement('div');
     card.className = 'vb-mb-card';
 
-    // Thumbnail
+    
     var thumb = document.createElement('div');
     thumb.className = 'vb-mb-thumb';
     if (board.thumbnail) {
@@ -4475,12 +4325,12 @@ function vbRenderMyBoards() {
       img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;';
       thumb.appendChild(img);
     } else {
-      // Render mini version inline
+      
       thumb.style.background = (board.background && board.background.value) || '#fff';
       thumb.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;opacity:0.4;font-size:24px;">🎯</div>';
     }
 
-    // Info row
+    
     var info = document.createElement('div');
     info.className = 'vb-mb-info';
 
@@ -4494,7 +4344,7 @@ function vbRenderMyBoards() {
     meta.textContent = d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) +
                        ' · ' + board.items.length + ' item' + (board.items.length !== 1 ? 's' : '');
 
-    // Actions
+    
     var actions = document.createElement('div');
     actions.className = 'vb-mb-actions';
 
