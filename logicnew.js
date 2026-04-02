@@ -95,6 +95,9 @@ const equilibraFeatures = [
   }
 ];
 
+localStorage.removeItem('eq_dark_mode');
+document.body.classList.remove('dark');
+
 function showPage(pageId) {
     document.querySelectorAll('.page').forEach(page => {
         page.classList.remove('active');
